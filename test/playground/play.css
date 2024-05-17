@@ -148,34 +148,61 @@ button {
   }
 }
 
+.destroyer,
+.submarine,
+.cruiser,
+.battleship,
+.carrier {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
 .destroyer-preview {
   width: 20px;
   height: 10px;
-  background-color: rgba(46, 46, 116, 0.732);
+}
+
+.destroyer {
+  background-color: rgba(46, 116, 81, 0.753);
 }
 
 .submarine-preview {
   width: 30px;
   height: 10px;
-  background-color: rgba(0, 221, 255, 0.729);
+}
+
+.submarine {
+  background-color: rgba(0, 221, 255, 0.714);
 }
 
 .cruiser-preview {
   width: 30px;
   height: 10px;
-  background-color: rgba(255, 183, 0, 0.729);
+}
+
+.cruiser {
+  background-color: rgb(255, 183, 0);
 }
 
 .battleship-preview {
   width: 40px;
   height: 10px;
-  background-color: rgba(255, 0, 0, 0.729);
 }
 
+.battleship {
+  background-color: rgb(255, 0, 0);
+}
 .carrier-preview {
   width: 50px;
   height: 10px;
-  background-color: rgba(63, 68, 63, 0.729);
+}
+
+.carrier {
+  background-color: rgb(63, 68, 63);
 }
 
 .animationNot-container {
