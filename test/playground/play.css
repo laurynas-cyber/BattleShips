@@ -1,0 +1,255 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Saira Stencil One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+body {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgb(2, 43, 79);
+}
+
+main {
+  height: 550px;
+}
+
+.twofields {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+
+  position: relative;
+  height: 550px;
+  transform: skew(35deg) rotateX(45deg);
+}
+
+.board {
+  position: relative;
+  z-index: 1;
+  background-color: rgb(2, 43, 79);
+  width: 500px;
+  height: 600px;
+  border: 4px solid greenyellow;
+  border-top: 2px solid greenyellow;
+  border-right: 2px solid greenyellow;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+
+  flex-wrap: wrap;
+  .drop-zone {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+    border: 1px solid greenyellow;
+    background-color: rgb(2, 43, 79);
+
+    &:hover {
+      cursor: crosshair;
+      background-color: rgba(30, 69, 104);
+    }
+  }
+}
+
+.computer-board {
+  /* opacity: 30%; */
+}
+
+.board::after {
+  content: "";
+  width: 495px;
+  height: 600px;
+  background-color: rgba(172, 255, 47, 0.471);
+  border: 2px solid rgb(213, 212, 177);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: -1;
+}
+
+section {
+  display: flex;
+  width: 100%;
+}
+
+.sectionTop {
+  font-size: 20px;
+  justify-content: flex-end;
+  height: 60px;
+  margin: 0;
+  .option-container {
+    align-items: center;
+    height: 80px;
+  }
+  .Infoline,
+  .whichPlayerturn {
+    color: rgb(8, 22, 35);
+  }
+  .message {
+    color: rgba(172, 255, 47, 0.471);
+  }
+}
+
+.option-container {
+  width: 700px;
+  height: 100px;
+  padding: 10px;
+
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  background-color: rgba(0, 255, 255, 0.255);
+  border-radius: 10px;
+}
+
+.buttons {
+  .btn {
+    background-color: rgb(2, 43, 79);
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+
+    color: yellowgreen;
+  }
+}
+
+button {
+  cursor: pointer;
+}
+
+.ship-conteiner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  div {
+    margin: 10px;
+  }
+}
+
+.destroyer-preview {
+  width: 20px;
+  height: 10px;
+  background-color: rgba(0, 0, 255, 0.732);
+}
+
+.submarine-preview {
+  width: 30px;
+  height: 10px;
+  background-color: rgba(0, 221, 255, 0.729);
+}
+
+.cruiser-preview {
+  width: 30px;
+  height: 10px;
+  background-color: rgba(255, 183, 0, 0.729);
+}
+
+.battleship-preview {
+  width: 40px;
+  height: 10px;
+  background-color: rgba(255, 0, 0, 0.729);
+}
+
+.carrier-preview {
+  width: 50px;
+  height: 10px;
+  background-color: rgba(63, 68, 63, 0.729);
+}
+
+.animationNot-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.animationNot {
+  position: relative;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  border: 2px solid white;
+  animation-name: NotHitted;
+  animation-duration: 4s;
+  animation-iteration-count: 1;
+  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@keyframes NotHitted {
+  0% {
+    height: 5px;
+    width: 5px;
+  }
+
+  100% {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.animationNot-delay {
+  position: absolute;
+  /* width: 80%;
+  height: 80%; */
+  border-radius: 50%;
+  border: 2px solid white;
+  animation-name: NotHitted-delay;
+  animation-duration: 4s;
+  animation-delay: 0.5s;
+  animation-iteration-count: 1;
+  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@keyframes NotHitted-delay {
+  0% {
+    height: 5px;
+    width: 5px;
+  }
+
+  100% {
+    width: 80%;
+    height: 80%;
+  }
+}
+
+.animationNot-delay2 {
+  position: absolute;
+  /* width: 50%;
+  height: 50%; */
+  border-radius: 50%;
+  border: 2px solid white;
+  animation-name: NotHitted-delay2;
+  animation-duration: 4s;
+  animation-delay: 1s;
+  animation-iteration-count: 1;
+  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@keyframes NotHitted-delay2 {
+  0% {
+    height: 5px;
+    width: 5px;
+  }
+
+  100% {
+    width: 50%;
+    height: 50%;
+  }
+}
