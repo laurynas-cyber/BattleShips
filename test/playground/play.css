@@ -94,6 +94,13 @@ section {
     align-items: center;
     height: 80px;
   }
+  .Info {
+    border-right: 1px solid rgb(8, 22, 35);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-right: 10px;
+  }
   .Infoline,
   .whichPlayerturn {
     color: rgb(8, 22, 35);
@@ -134,15 +141,17 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  div {
-    margin: 10px;
+  .ship {
+    margin: 20px 10px 10px 10px;
+    border-radius: 4px;
+    transition: rotate ease-in 0.3s;
   }
 }
 
 .destroyer-preview {
   width: 20px;
   height: 10px;
-  background-color: rgba(0, 0, 255, 0.732);
+  background-color: rgba(46, 46, 116, 0.732);
 }
 
 .submarine-preview {
