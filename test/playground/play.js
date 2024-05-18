@@ -8,15 +8,18 @@ const DropZone = document.querySelectorAll(".drop-zone");
 const AllShips = document.querySelectorAll(".ship");
 const FlipBtn = document.querySelector(".btnFlip");
 const ComputersBlock = document.querySelectorAll(".computer-board div");
+const Message = document.querySelector(".message");
+// const AnimationNot = document.querySelector()
 
 let html = ` <div class="zone nothit">
 <div class="animationNot-container">
-  <div class="animationNot"></div>
-  <div class="animationNot-delay"></div>
-  <div class="animationNot-delay2"></div>
+  <div class="animationNot animation"></div>
+  <div class="animationNot-delay animation"></div>
+  <div class="animationNot-delay2 animation"></div>
 </div>
 </div>`;
 let angle = 0;
+let UsedShipblocks = [];
 
 //give every field Id
 
@@ -51,6 +54,44 @@ const carrier = new Ship("carrier", 5);
 const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 
 // add ships
+function checkAroundBlock(block) {
+  let numblockId = Number(block.id);
+
+  if (numblockId % 10 != 9 && numblockId % 10 != 0) {
+    if (
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 - 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 + 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 - 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 + 1])
+    ) {
+      return true;
+    }
+  } else if (numblockId % 10 == 0) {
+    if (
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 + 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 + 1])
+    ) {
+      return true;
+    }
+  } else if (numblockId % 10 == 9) {
+    if (
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 - 1]) ||
+      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 - 1])
+    ) {
+      return true;
+    }
+  }
+}
 
 function AddPiece(ship) {
   let RandomIndex = rand(0, 99);
@@ -63,8 +104,12 @@ function AddPiece(ship) {
   do {
     if (isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i];
-      if (validBlock != undefined) {
-        shipBlocks.push(validBlock);
+      if (validBlock != undefined && !UsedShipblocks.includes(validBlock)) {
+        validHoriz =
+          (Number(ComputersBlock[RandomIndex].id) % 10) + ship.length <= 9;
+        if (validHoriz) {
+          shipBlocks.push(validBlock);
+        }
       } else {
         i = 0;
         shipBlocks = [];
@@ -72,7 +117,7 @@ function AddPiece(ship) {
       }
     } else if (!isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i * 10];
-      if (validBlock != undefined) {
+      if (validBlock != undefined && !UsedShipblocks.includes(validBlock)) {
         shipBlocks.push(validBlock);
       } else {
         i = 0;
@@ -80,39 +125,22 @@ function AddPiece(ship) {
         RandomIndex = rand(0, 99);
       }
     }
+    if (shipBlocks.length == ship.length) {
+      shipBlocks.forEach((block) => UsedShipblocks.push(block));
+    }
     i++;
   } while (shipBlocks.length != ship.length);
-  console.log(shipBlocks, ship.length, shipBlocks.length == ship.length);
 
-  // for (let i = 0; i < ship.length; i++) {
-  //   if (isHorrizontal) {
-  //     validBlock = ComputersBlock[RandomIndex + i];
-  //     // console.log(validBlock, i);
-  //     if (validBlock == undefined) {
-  //       i = 0;
-  //       console.log(i);
-  //     } else shipBlocks.push(ComputersBlock[RandomIndex + i]);
-  //   } else if (!isHorrizontal) {
-  //     validBlock = ComputersBlock[RandomIndex + i * 10];
-
-  //     if (validBlock == undefined) {
-  //       i = 0;
-  //       console.log(i);
-  //     } else shipBlocks.push(ComputersBlock[RandomIndex + i * 10]);
-  //   }
-  // }
   shipBlocks.forEach((block) => {
     block.classList.add(ship.name);
+    console.log(block);
     block.classList.add("taken");
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
   });
 }
 
-// AllShipsArray.forEach((ship) => AddPiece(ship));
-
-// AddPiece(destroyer);
-AddPiece(submarine);
+AllShipsArray.forEach((ship) => AddPiece(ship));
 
 //animation
 
@@ -120,6 +148,16 @@ DropZone.forEach((zone) =>
   zone.addEventListener("click", function () {
     console.log(zone);
     zone.innerHTML = html;
+    if (checkAroundBlock(zone)) {
+      Message.innerHTML = "That was close!";
+      Message.style.color = "rgba(183, 138, 24, 0.821)";
+      zone.querySelectorAll(".animation").forEach((animation) => {
+        animation.style.border = "2px solid rgba(183, 138, 24)";
+      });
+    } else {
+      Message.innerHTML = "Missed";
+      Message.style.color = "rgba(172, 255, 47, 0.471)";
+    }
   })
 );
 

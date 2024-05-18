@@ -185,7 +185,7 @@ button {
 }
 
 .cruiser {
-  background-color: rgb(167, 134, 50);
+  background-color: rgba(167, 134, 50, 0.723);
 }
 
 .battleship-preview {
@@ -194,7 +194,7 @@ button {
 }
 
 .battleship {
-  background-color: rgb(133, 50, 50);
+  background-color: rgba(133, 50, 50, 0.914);
 }
 .carrier-preview {
   width: 50px;
