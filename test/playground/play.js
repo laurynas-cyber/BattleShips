@@ -18,6 +18,13 @@ let html = ` <div class="zone nothit">
 </div>`;
 let angle = 0;
 
+//give every field Id
+
+ComputersBlock.forEach((block, i) => {
+  block.id = i;
+  // block.style.backgroundColor = "rgb(2, 43, 79)";
+});
+
 //buttons
 
 FlipBtn.addEventListener("click", function () {
@@ -46,34 +53,66 @@ const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 // add ships
 
 function AddPiece(ship) {
-  ComputersBlock.forEach((block, i) => {
-    block.id = i;
-    // block.style.backgroundColor = "rgb(2, 43, 79)";
-  });
   let RandomIndex = rand(0, 99);
   let isHorrizontal = !!rand(0, 1);
 
+  let validBlock;
+  let i = 0;
   let shipBlocks = [];
 
-  for (let i = 0; i < ship.length; i++) {
+  do {
     if (isHorrizontal) {
-      shipBlocks.push(ComputersBlock[RandomIndex + i]);
+      validBlock = ComputersBlock[RandomIndex + i];
+      if (validBlock != undefined) {
+        shipBlocks.push(validBlock);
+      } else {
+        i = 0;
+        shipBlocks = [];
+        RandomIndex = rand(0, 99);
+      }
     } else if (!isHorrizontal) {
-      shipBlocks.push(ComputersBlock[RandomIndex + i * 10]);
+      validBlock = ComputersBlock[RandomIndex + i * 10];
+      if (validBlock != undefined) {
+        shipBlocks.push(validBlock);
+      } else {
+        i = 0;
+        shipBlocks = [];
+        RandomIndex = rand(0, 99);
+      }
     }
-  }
+    i++;
+  } while (shipBlocks.length != ship.length);
+  console.log(shipBlocks, ship.length, shipBlocks.length == ship.length);
+
+  // for (let i = 0; i < ship.length; i++) {
+  //   if (isHorrizontal) {
+  //     validBlock = ComputersBlock[RandomIndex + i];
+  //     // console.log(validBlock, i);
+  //     if (validBlock == undefined) {
+  //       i = 0;
+  //       console.log(i);
+  //     } else shipBlocks.push(ComputersBlock[RandomIndex + i]);
+  //   } else if (!isHorrizontal) {
+  //     validBlock = ComputersBlock[RandomIndex + i * 10];
+
+  //     if (validBlock == undefined) {
+  //       i = 0;
+  //       console.log(i);
+  //     } else shipBlocks.push(ComputersBlock[RandomIndex + i * 10]);
+  //   }
+  // }
   shipBlocks.forEach((block) => {
-    console.log(block); //gaunam undefined nes iseina is ribu.
     block.classList.add(ship.name);
+    block.classList.add("taken");
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
   });
 }
 
-AllShipsArray.forEach((ship) => AddPiece(ship));
+// AllShipsArray.forEach((ship) => AddPiece(ship));
 
 // AddPiece(destroyer);
-// AddPiece(submarine);
+AddPiece(submarine);
 
 //animation
 
