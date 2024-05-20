@@ -93,10 +93,44 @@ function checkAroundBlock(block) {
   }
 }
 
+function ProducingShip(block, shipName) {
+  let numblockId = Number(block.id);
+  let allAroundBlock = [];
+  if (numblockId % 10 != 9 && numblockId % 10 != 0) {
+    allAroundBlock.push(ComputersBlock[numblockId + 1]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1]);
+    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 - 1]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 + 1]);
+    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 - 1]);
+    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 + 1]);
+  } else if (numblockId % 10 == 0) {
+    allAroundBlock.push(ComputersBlock[numblockId + 1]);
+    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 + 1]);
+    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 + 1]);
+  } else if (numblockId % 10 == 9) {
+    allAroundBlock.push(ComputersBlock[numblockId - 1]);
+    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10]);
+    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 - 1]);
+    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 - 1]);
+  }
+
+  allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
+  allAroundBlock = allAroundBlock.filter(
+    (block) => !block.classList.contains(shipName)
+  );
+  return allAroundBlock.every((block) => !block.classList.contains("taken"));
+}
+
 function AddPiece(ship) {
   let RandomIndex = rand(0, 99);
   let isHorrizontal = !!rand(0, 1);
 
+  let validHoriz;
   let validBlock;
   let i = 0;
   let shipBlocks = [];
@@ -104,7 +138,11 @@ function AddPiece(ship) {
   do {
     if (isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i];
-      if (validBlock != undefined && !UsedShipblocks.includes(validBlock)) {
+      if (
+        validBlock != undefined &&
+        !UsedShipblocks.includes(validBlock) &&
+        ProducingShip(validBlock, ship.name)
+      ) {
         validHoriz =
           (Number(ComputersBlock[RandomIndex].id) % 10) + ship.length <= 9;
         if (validHoriz) {
@@ -117,7 +155,11 @@ function AddPiece(ship) {
       }
     } else if (!isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i * 10];
-      if (validBlock != undefined && !UsedShipblocks.includes(validBlock)) {
+      if (
+        validBlock != undefined &&
+        !UsedShipblocks.includes(validBlock) &&
+        ProducingShip(validBlock, ship.name)
+      ) {
         shipBlocks.push(validBlock);
       } else {
         i = 0;
@@ -133,7 +175,6 @@ function AddPiece(ship) {
 
   shipBlocks.forEach((block) => {
     block.classList.add(ship.name);
-    console.log(block);
     block.classList.add("taken");
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";

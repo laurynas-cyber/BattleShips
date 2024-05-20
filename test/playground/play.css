@@ -47,6 +47,9 @@ main {
   grid-template-rows: repeat(10, 1fr);
 
   flex-wrap: wrap;
+  div {
+    cursor: crosshair;
+  }
   .drop-zone {
     position: relative;
     display: flex;
@@ -58,7 +61,6 @@ main {
     background-color: rgb(2, 43, 79);
 
     &:hover {
-      cursor: crosshair;
       background-color: rgba(30, 69, 104);
     }
   }
