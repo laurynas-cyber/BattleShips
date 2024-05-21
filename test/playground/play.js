@@ -63,7 +63,7 @@ const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 // add ships
 
 function AllAroundBlocks(block, shipName = "") {
-  let numblockId = Number(block.id);
+  let numblockId = Number(block.id); // reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
   let allAroundBlock = [];
   if (numblockId % 10 != 9 && numblockId % 10 != 0) {
     allAroundBlock.push(ComputersBlock[numblockId + 1]);
@@ -91,10 +91,10 @@ function AllAroundBlocks(block, shipName = "") {
     allAroundBlock = allAroundBlock.filter(
       (block) => block !== undefined && !block.classList.contains(shipName)
     );
-    return allAroundBlock.every((block) => !block.classList.contains("taken"));
+    return allAroundBlock.every((block) => !block.classList.contains("taken")); // gamybai
   } else {
     allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
-    return allAroundBlock.some((block) => block.classList.contains("taken"));
+    return allAroundBlock.some((block) => block.classList.contains("taken")); //ieskojimui
   }
 }
 
@@ -171,9 +171,14 @@ function AddPlayerPiece(ship, startIndex) {
   do {
     if (angle == 0) {
       validBlock = AllPlayerBlocks[startIndex + i];
+      validHoriz =
+        (Number(AllPlayerBlocks[startIndex].dataset.id) % 10) + ship.length <=
+        10; // kazkodel cia 10 o computer 9
       if (
+        validHoriz &&
         !UsedPlayerShipblocks.includes(validBlock) &&
         validBlock != undefined
+        //  && AllAroundBlocks(validBlock, ship.name)
       ) {
         console.log(validBlock);
         shipBlocks.push(validBlock);
@@ -186,7 +191,11 @@ function AddPlayerPiece(ship, startIndex) {
     }
     if (angle == 90) {
       validBlock = AllPlayerBlocks[startIndex + i * 10];
-      if (!UsedPlayerShipblocks.includes(validBlock)) {
+      if (
+        !UsedPlayerShipblocks.includes(validBlock) &&
+        validBlock != undefined
+        // && AllAroundBlocks(validBlock, ship.name)
+      ) {
         console.log(validBlock);
         shipBlocks.push(validBlock);
       } else {
@@ -208,39 +217,6 @@ function AddPlayerPiece(ship, startIndex) {
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
   });
-
-  // do {
-  //   if (angle == 0) {
-  //     validBlock = ComputersBlock[startIndex + i];
-  //     validHoriz =
-  //       (Number(ComputersBlock[startIndex].id) % 10) + ship.length <= 9;
-  //     if (
-  //       validHoriz &&
-  //       validBlock != undefined &&
-  //       AllAroundBlocks(validBlock, ship.name)
-  //     ) {
-  //       shipBlocks.push(validBlock);
-  //     } else {
-  //       i = 0;
-  //       shipBlocks = [];
-  //     }
-  //   } else if (angle == 90) {
-  //     validBlock = ComputersBlock[startIndex + i * 10];
-  //     if (
-  //       validBlock != undefined &&
-  //       AllAroundBlocks(validBlock, ship.name) //uzloopina
-  //     ) {
-  //       shipBlocks.push(validBlock);
-  //     } else {
-  //       i = 0;
-  //       shipBlocks = [];
-  //     }
-  //   }
-  //   if (shipBlocks.length == ship.length) {
-  //     shipBlocks.forEach((block) => UsedShipblocks.push(block));
-  //   }
-  //   i++;
-  // } while (shipBlocks.length != ship.length);
 }
 
 const AllPlayerShips = document.querySelectorAll(".ship");
@@ -256,10 +232,19 @@ AllPlayerBlocks.forEach((playerblock) => {
   playerblock.addEventListener("drop", dropShip);
 });
 
+function shadowedDragBlock() {
+  document.querySelector(".computer-board").style.opacity = "50%";
+  UsedPlayerShipblocks.forEach((block) => {
+    AllAroundBlocks(block); // parasyti funkcija kuri surenka visus aplinkinius blokus
+
+    block.style.opacity = "70%";
+  });
+}
+
 function dragStart(e) {
+  shadowedDragBlock();
   notDropped = false;
   draggedShip = e.target;
-  document.querySelector(".computer-board").style.opacity = "50%";
 }
 
 function dragOver(e) {
@@ -273,6 +258,7 @@ function dropShip(e) {
 
   AddPlayerPiece(ship, startId);
   document.querySelector(".computer-board").style.opacity = "100%";
+  UsedPlayerShipblocks.forEach((block) => (block.style.opacity = "100%"));
   if (!notDropped) {
     draggedShip.remove();
   }
@@ -303,3 +289,7 @@ DropZone.forEach((zone) =>
     }
   })
 );
+
+
+// All arround funkcija pertvarkyti kad atskira funkcija rinktu ir grazintu masyva su aplinkiniais blokais 
+// reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id

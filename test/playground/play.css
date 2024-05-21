@@ -31,7 +31,6 @@ main {
   position: relative;
   height: 620px;
   transform: skew(35deg) rotateX(45deg);
-  border: solid 1px red;
 }
 
 .board {
