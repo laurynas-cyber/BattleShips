@@ -8,6 +8,7 @@ const DropZone = document.querySelectorAll(".drop-zone");
 const AllShips = document.querySelectorAll(".ship");
 const FlipBtn = document.querySelector(".btnFlip");
 const ComputersBlock = document.querySelectorAll(".computer-board div");
+const AllPlayerBlocks = document.querySelectorAll(".player-board div");
 const Message = document.querySelector(".message");
 // const AnimationNot = document.querySelector()
 
@@ -20,18 +21,24 @@ let html = ` <div class="zone nothit">
 </div>`;
 let angle = 0;
 let UsedShipblocks = [];
+let UsedPlayerShipblocks = [];
+let notDropped;
 
 //give every field Id
 
 ComputersBlock.forEach((block, i) => {
   block.id = i;
-  // block.style.backgroundColor = "rgb(2, 43, 79)";
+});
+
+AllPlayerBlocks.forEach((block, i) => {
+  block.dataset.id = i;
 });
 
 //buttons
 
 FlipBtn.addEventListener("click", function () {
   angle = angle === 0 ? 90 : 0;
+  console.log(angle);
   AllShips.forEach((ship) => {
     ship.style.rotate = `${angle}deg`;
   });
@@ -54,46 +61,8 @@ const carrier = new Ship("carrier", 5);
 const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 
 // add ships
-function checkAroundBlock(block) {
-  let numblockId = Number(block.id);
 
-  if (numblockId % 10 != 9 && numblockId % 10 != 0) {
-    if (
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 - 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 + 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 - 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 + 1])
-    ) {
-      return true;
-    }
-  } else if (numblockId % 10 == 0) {
-    if (
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 + 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 + 1])
-    ) {
-      return true;
-    }
-  } else if (numblockId % 10 == 9) {
-    if (
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId - 1 * 10 - 1]) ||
-      UsedShipblocks.includes(ComputersBlock[numblockId + 1 * 10 - 1])
-    ) {
-      return true;
-    }
-  }
-}
-
-function ProducingShip(block, shipName) {
+function AllAroundBlocks(block, shipName = "") {
   let numblockId = Number(block.id);
   let allAroundBlock = [];
   if (numblockId % 10 != 9 && numblockId % 10 != 0) {
@@ -118,18 +87,20 @@ function ProducingShip(block, shipName) {
     allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 - 1]);
     allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 - 1]);
   }
-
-  allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
-  allAroundBlock = allAroundBlock.filter(
-    (block) => !block.classList.contains(shipName)
-  );
-  return allAroundBlock.every((block) => !block.classList.contains("taken"));
+  if (!!shipName) {
+    allAroundBlock = allAroundBlock.filter(
+      (block) => block !== undefined && !block.classList.contains(shipName)
+    );
+    return allAroundBlock.every((block) => !block.classList.contains("taken"));
+  } else {
+    allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
+    return allAroundBlock.some((block) => block.classList.contains("taken"));
+  }
 }
 
 function AddPiece(ship) {
   let RandomIndex = rand(0, 99);
   let isHorrizontal = !!rand(0, 1);
-
   let validHoriz;
   let validBlock;
   let i = 0;
@@ -138,16 +109,15 @@ function AddPiece(ship) {
   do {
     if (isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i];
+      validHoriz =
+        (Number(ComputersBlock[RandomIndex].id) % 10) + ship.length <= 9;
       if (
+        validHoriz &&
         validBlock != undefined &&
         !UsedShipblocks.includes(validBlock) &&
-        ProducingShip(validBlock, ship.name)
+        AllAroundBlocks(validBlock, ship.name)
       ) {
-        validHoriz =
-          (Number(ComputersBlock[RandomIndex].id) % 10) + ship.length <= 9;
-        if (validHoriz) {
-          shipBlocks.push(validBlock);
-        }
+        shipBlocks.push(validBlock);
       } else {
         i = 0;
         shipBlocks = [];
@@ -158,7 +128,7 @@ function AddPiece(ship) {
       if (
         validBlock != undefined &&
         !UsedShipblocks.includes(validBlock) &&
-        ProducingShip(validBlock, ship.name)
+        AllAroundBlocks(validBlock, ship.name) //uzloopina
       ) {
         shipBlocks.push(validBlock);
       } else {
@@ -183,13 +153,145 @@ function AddPiece(ship) {
 
 AllShipsArray.forEach((ship) => AddPiece(ship));
 
+//player drop
+
+function AddPlayerPiece(ship, startIndex) {
+  Message.innerHTML = "Place your ship";
+  Message.style.color = "green";
+  // notDropped = false;
+  let validHoriz;
+  let validBlock;
+  let i = 0;
+  let shipBlocks = [];
+
+  console.log(startIndex);
+  console.log(angle);
+  console.log(UsedPlayerShipblocks);
+
+  do {
+    if (angle == 0) {
+      validBlock = AllPlayerBlocks[startIndex + i];
+      if (
+        !UsedPlayerShipblocks.includes(validBlock) &&
+        validBlock != undefined
+      ) {
+        console.log(validBlock);
+        shipBlocks.push(validBlock);
+      } else {
+        Message.innerHTML = "You cant place here";
+        Message.style.color = "rgba(183, 138, 24, 0.821)";
+        notDropped = true;
+        return false;
+      }
+    }
+    if (angle == 90) {
+      validBlock = AllPlayerBlocks[startIndex + i * 10];
+      if (!UsedPlayerShipblocks.includes(validBlock)) {
+        console.log(validBlock);
+        shipBlocks.push(validBlock);
+      } else {
+        Message.innerHTML = "You cant place here";
+        Message.style.color = "rgba(183, 138, 24, 0.821)";
+        notDropped = true;
+        return false;
+      }
+    }
+    if (shipBlocks.length == ship.length) {
+      shipBlocks.forEach((block) => UsedPlayerShipblocks.push(block));
+    }
+    i++;
+  } while (shipBlocks.length != ship.length);
+
+  shipBlocks.forEach((block) => {
+    block.classList.add(ship.name);
+    block.classList.add("taken");
+    block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
+    block.style.border = "1px solid greenyellow";
+  });
+
+  // do {
+  //   if (angle == 0) {
+  //     validBlock = ComputersBlock[startIndex + i];
+  //     validHoriz =
+  //       (Number(ComputersBlock[startIndex].id) % 10) + ship.length <= 9;
+  //     if (
+  //       validHoriz &&
+  //       validBlock != undefined &&
+  //       AllAroundBlocks(validBlock, ship.name)
+  //     ) {
+  //       shipBlocks.push(validBlock);
+  //     } else {
+  //       i = 0;
+  //       shipBlocks = [];
+  //     }
+  //   } else if (angle == 90) {
+  //     validBlock = ComputersBlock[startIndex + i * 10];
+  //     if (
+  //       validBlock != undefined &&
+  //       AllAroundBlocks(validBlock, ship.name) //uzloopina
+  //     ) {
+  //       shipBlocks.push(validBlock);
+  //     } else {
+  //       i = 0;
+  //       shipBlocks = [];
+  //     }
+  //   }
+  //   if (shipBlocks.length == ship.length) {
+  //     shipBlocks.forEach((block) => UsedShipblocks.push(block));
+  //   }
+  //   i++;
+  // } while (shipBlocks.length != ship.length);
+}
+
+const AllPlayerShips = document.querySelectorAll(".ship");
+
+let draggedShip;
+
+AllPlayerShips.forEach((optionShip) =>
+  optionShip.addEventListener("dragstart", dragStart)
+);
+
+AllPlayerBlocks.forEach((playerblock) => {
+  playerblock.addEventListener("dragover", dragOver);
+  playerblock.addEventListener("drop", dropShip);
+});
+
+function dragStart(e) {
+  notDropped = false;
+  draggedShip = e.target;
+  document.querySelector(".computer-board").style.opacity = "50%";
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  // e.target.style.backgroundColor = "red";
+}
+
+function dropShip(e) {
+  const startId = Number(e.target.dataset.id);
+  const ship = AllShipsArray[draggedShip.id];
+
+  AddPlayerPiece(ship, startId);
+  document.querySelector(".computer-board").style.opacity = "100%";
+  if (!notDropped) {
+    draggedShip.remove();
+  }
+}
+
+//add Highlight for blocks
+
+function HighlightAre(startIndex, index) {
+  AllPlayerBlocks;
+}
+
 //animation
 
 DropZone.forEach((zone) =>
   zone.addEventListener("click", function () {
     console.log(zone);
+
     zone.innerHTML = html;
-    if (checkAroundBlock(zone)) {
+    if (AllAroundBlocks(zone)) {
       Message.innerHTML = "That was close!";
       Message.style.color = "rgba(183, 138, 24, 0.821)";
       zone.querySelectorAll(".animation").forEach((animation) => {
@@ -201,13 +303,3 @@ DropZone.forEach((zone) =>
     }
   })
 );
-
-// DropZone.forEach((zone) => {
-//   zone.addEventListener("dragover", function (event) {
-//     event.preventDefault();
-//   });
-//   zone.addEventListener("drop", function (event) {
-//     // zone.prepend(card);
-//     zone.appendChild(card);
-//   });
-// });
