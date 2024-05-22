@@ -27,7 +27,7 @@ let notDropped;
 //give every field Id
 
 ComputersBlock.forEach((block, i) => {
-  block.id = i;
+  block.dataset.id = i;
 });
 
 AllPlayerBlocks.forEach((block, i) => {
@@ -62,8 +62,8 @@ const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 
 // add ships
 
-function AllAroundBlocks(block, shipName = "") {
-  let numblockId = Number(block.id); // reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
+function AllAroundBlocks(block) {
+  let numblockId = Number(block.dataset.id); // reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
   let allAroundBlock = [];
   if (numblockId % 10 != 9 && numblockId % 10 != 0) {
     allAroundBlock.push(ComputersBlock[numblockId + 1]);
@@ -87,15 +87,21 @@ function AllAroundBlocks(block, shipName = "") {
     allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 - 1]);
     allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 - 1]);
   }
-  if (!!shipName) {
-    allAroundBlock = allAroundBlock.filter(
-      (block) => block !== undefined && !block.classList.contains(shipName)
-    );
-    return allAroundBlock.every((block) => !block.classList.contains("taken")); // gamybai
-  } else {
-    allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
-    return allAroundBlock.some((block) => block.classList.contains("taken")); //ieskojimui
-  }
+  // allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
+  // allAroundBlock.forEach((block) => block.classList.add("taken"));
+  return allAroundBlock;
+}
+
+function CheckAroundBlocksProduction(arr, shipName) {
+  arr = arr.filter(
+    (block) => block !== undefined && !block.classList.contains(shipName)
+  );
+  return arr.every((block) => !block.classList.contains("taken"));
+}
+
+function CheckAroundTakenBlocks(arr) {
+  arr = arr.filter((block) => block !== undefined);
+  return arr.some((block) => block.classList.contains("taken")); //ieskojimui
 }
 
 function AddPiece(ship) {
@@ -110,12 +116,13 @@ function AddPiece(ship) {
     if (isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i];
       validHoriz =
-        (Number(ComputersBlock[RandomIndex].id) % 10) + ship.length <= 9;
+        (Number(ComputersBlock[RandomIndex].dataset.id) % 10) + ship.length <=
+        9;
       if (
         validHoriz &&
         validBlock != undefined &&
         !UsedShipblocks.includes(validBlock) &&
-        AllAroundBlocks(validBlock, ship.name)
+        CheckAroundBlocksProduction(AllAroundBlocks(validBlock), ship.name)
       ) {
         shipBlocks.push(validBlock);
       } else {
@@ -128,7 +135,7 @@ function AddPiece(ship) {
       if (
         validBlock != undefined &&
         !UsedShipblocks.includes(validBlock) &&
-        AllAroundBlocks(validBlock, ship.name) //uzloopina
+        CheckAroundBlocksProduction(AllAroundBlocks(validBlock), ship.name) //uzloopina
       ) {
         shipBlocks.push(validBlock);
       } else {
@@ -163,10 +170,6 @@ function AddPlayerPiece(ship, startIndex) {
   let validBlock;
   let i = 0;
   let shipBlocks = [];
-
-  console.log(startIndex);
-  console.log(angle);
-  console.log(UsedPlayerShipblocks);
 
   do {
     if (angle == 0) {
@@ -219,30 +222,20 @@ function AddPlayerPiece(ship, startIndex) {
   });
 }
 
+// drag
 const AllPlayerShips = document.querySelectorAll(".ship");
 
 let draggedShip;
 
-AllPlayerShips.forEach((optionShip) =>
-  optionShip.addEventListener("dragstart", dragStart)
-);
+function OpacityUnavailableZone(arr) {}
 
-AllPlayerBlocks.forEach((playerblock) => {
-  playerblock.addEventListener("dragover", dragOver);
-  playerblock.addEventListener("drop", dropShip);
-});
-
+//
 function shadowedDragBlock() {
-  document.querySelector(".computer-board").style.opacity = "50%";
-  UsedPlayerShipblocks.forEach((block) => {
-    AllAroundBlocks(block); // parasyti funkcija kuri surenka visus aplinkinius blokus
-
-    block.style.opacity = "70%";
-  });
+  // document.querySelector(".computer-board").style.opacity = "50%";
 }
 
 function dragStart(e) {
-  shadowedDragBlock();
+  // shadowedDragBlock();
   notDropped = false;
   draggedShip = e.target;
 }
@@ -258,11 +251,20 @@ function dropShip(e) {
 
   AddPlayerPiece(ship, startId);
   document.querySelector(".computer-board").style.opacity = "100%";
-  UsedPlayerShipblocks.forEach((block) => (block.style.opacity = "100%"));
+  // AllPlayerBlocks.forEach((block) => (block.style.opacity = "100%"));
   if (!notDropped) {
     draggedShip.remove();
   }
 }
+
+AllPlayerShips.forEach((optionShip) =>
+  optionShip.addEventListener("dragstart", dragStart)
+);
+
+AllPlayerBlocks.forEach((playerblock) => {
+  playerblock.addEventListener("dragover", dragOver);
+  playerblock.addEventListener("drop", dropShip);
+});
 
 //add Highlight for blocks
 
@@ -275,9 +277,8 @@ function HighlightAre(startIndex, index) {
 DropZone.forEach((zone) =>
   zone.addEventListener("click", function () {
     console.log(zone);
-
     zone.innerHTML = html;
-    if (AllAroundBlocks(zone)) {
+    if (CheckAroundTakenBlocks(AllAroundBlocks(zone))) {
       Message.innerHTML = "That was close!";
       Message.style.color = "rgba(183, 138, 24, 0.821)";
       zone.querySelectorAll(".animation").forEach((animation) => {
@@ -290,6 +291,5 @@ DropZone.forEach((zone) =>
   })
 );
 
-
-// All arround funkcija pertvarkyti kad atskira funkcija rinktu ir grazintu masyva su aplinkiniais blokais 
+// All arround funkcija pertvarkyti kad atskira funkcija rinktu ir grazintu masyva su aplinkiniais blokais
 // reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
