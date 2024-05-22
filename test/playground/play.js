@@ -62,47 +62,47 @@ const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 
 // add ships
 
-function AllAroundBlocks(block) {
+function AllAroundBlocks(Boardblocks, block) {
   let numblockId = Number(block.dataset.id); // reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
   let allAroundBlock = [];
   if (numblockId % 10 != 9 && numblockId % 10 != 0) {
-    allAroundBlock.push(ComputersBlock[numblockId + 1]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1]);
-    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 - 1]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 + 1]);
-    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 - 1]);
-    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 + 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1]);
+    allAroundBlock.push(Boardblocks[numblockId - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10 - 1]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10 + 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10 - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10 + 1]);
   } else if (numblockId % 10 == 0) {
-    allAroundBlock.push(ComputersBlock[numblockId + 1]);
-    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 + 1]);
-    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 + 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10 + 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10 + 1]);
   } else if (numblockId % 10 == 9) {
-    allAroundBlock.push(ComputersBlock[numblockId - 1]);
-    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10]);
-    allAroundBlock.push(ComputersBlock[numblockId - 1 * 10 - 1]);
-    allAroundBlock.push(ComputersBlock[numblockId + 1 * 10 - 1]);
+    allAroundBlock.push(Boardblocks[numblockId - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10 - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10 - 1]);
   }
-  // allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
-  // allAroundBlock.forEach((block) => block.classList.add("taken"));
+  allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
   return allAroundBlock;
 }
 
 function CheckAroundBlocksProduction(arr, shipName) {
-  arr = arr.filter(
-    (block) => block !== undefined && !block.classList.contains(shipName)
-  );
+  arr = arr.filter((block) => !block.classList.contains(shipName));
   return arr.every((block) => !block.classList.contains("taken"));
 }
 
-function CheckAroundTakenBlocks(arr) {
-  arr = arr.filter((block) => block !== undefined);
-  return arr.some((block) => block.classList.contains("taken")); //ieskojimui
+function CheckAroundTakenBlocks(block) {
+  return block.classList.contains("takenArround"); //ieskojimui
 }
+
+// function CheckAroundTakenBlocks(arr) {
+//   return arr.some((block) => block.classList.contains("taken")); //ieskojimui
+// }
 
 function AddPiece(ship) {
   let RandomIndex = rand(0, 99);
@@ -122,7 +122,10 @@ function AddPiece(ship) {
         validHoriz &&
         validBlock != undefined &&
         !UsedShipblocks.includes(validBlock) &&
-        CheckAroundBlocksProduction(AllAroundBlocks(validBlock), ship.name)
+        CheckAroundBlocksProduction(
+          AllAroundBlocks(ComputersBlock, validBlock),
+          ship.name
+        )
       ) {
         shipBlocks.push(validBlock);
       } else {
@@ -135,7 +138,10 @@ function AddPiece(ship) {
       if (
         validBlock != undefined &&
         !UsedShipblocks.includes(validBlock) &&
-        CheckAroundBlocksProduction(AllAroundBlocks(validBlock), ship.name) //uzloopina
+        CheckAroundBlocksProduction(
+          AllAroundBlocks(ComputersBlock, validBlock),
+          ship.name
+        ) //uzloopina
       ) {
         shipBlocks.push(validBlock);
       } else {
@@ -155,6 +161,9 @@ function AddPiece(ship) {
     block.classList.add("taken");
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
+    AllAroundBlocks(ComputersBlock, block).forEach((blocks) => {
+      blocks.classList.add("takenArround");
+    });
   });
 }
 
@@ -180,10 +189,12 @@ function AddPlayerPiece(ship, startIndex) {
       if (
         validHoriz &&
         !UsedPlayerShipblocks.includes(validBlock) &&
-        validBlock != undefined
-        //  && AllAroundBlocks(validBlock, ship.name)
+        validBlock != undefined &&
+        CheckAroundBlocksProduction(
+          AllAroundBlocks(AllPlayerBlocks, validBlock),
+          ship.name
+        )
       ) {
-        console.log(validBlock);
         shipBlocks.push(validBlock);
       } else {
         Message.innerHTML = "You cant place here";
@@ -196,8 +207,11 @@ function AddPlayerPiece(ship, startIndex) {
       validBlock = AllPlayerBlocks[startIndex + i * 10];
       if (
         !UsedPlayerShipblocks.includes(validBlock) &&
-        validBlock != undefined
-        // && AllAroundBlocks(validBlock, ship.name)
+        validBlock != undefined &&
+        CheckAroundBlocksProduction(
+          AllAroundBlocks(AllPlayerBlocks, validBlock),
+          ship.name
+        )
       ) {
         console.log(validBlock);
         shipBlocks.push(validBlock);
@@ -219,6 +233,9 @@ function AddPlayerPiece(ship, startIndex) {
     block.classList.add("taken");
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
+    AllAroundBlocks(AllPlayerBlocks, block).forEach((blocks) => {
+      blocks.classList.add("takenArround");
+    });
   });
 }
 
@@ -227,22 +244,29 @@ const AllPlayerShips = document.querySelectorAll(".ship");
 
 let draggedShip;
 
-function OpacityUnavailableZone(arr) {}
-
 //
-function shadowedDragBlock() {
-  // document.querySelector(".computer-board").style.opacity = "50%";
+function shadowedDragBlock(arr, percentP, percentC) {
+  document.querySelector(".computer-board").style.opacity = percentC;
+  arr.forEach((block) => {
+    if (
+      block.classList.contains("taken") ||
+      block.classList.contains("takenArround")
+    ) {
+      block.style.opacity = percentP;
+    }
+  });
 }
 
 function dragStart(e) {
-  // shadowedDragBlock();
+  shadowedDragBlock(AllPlayerBlocks, "20%", "50%");
   notDropped = false;
   draggedShip = e.target;
 }
 
 function dragOver(e) {
   e.preventDefault();
-  // e.target.style.backgroundColor = "red";
+  console.log(e);
+  // e.target.style.backgroundColor = "rgba(30, 69, 104)";
 }
 
 function dropShip(e) {
@@ -250,8 +274,7 @@ function dropShip(e) {
   const ship = AllShipsArray[draggedShip.id];
 
   AddPlayerPiece(ship, startId);
-  document.querySelector(".computer-board").style.opacity = "100%";
-  // AllPlayerBlocks.forEach((block) => (block.style.opacity = "100%"));
+  shadowedDragBlock(AllPlayerBlocks, "100%", "100%");
   if (!notDropped) {
     draggedShip.remove();
   }
@@ -277,8 +300,9 @@ function HighlightAre(startIndex, index) {
 DropZone.forEach((zone) =>
   zone.addEventListener("click", function () {
     console.log(zone);
+    console.log(CheckAroundTakenBlocks(zone));
     zone.innerHTML = html;
-    if (CheckAroundTakenBlocks(AllAroundBlocks(zone))) {
+    if (CheckAroundTakenBlocks(zone)) {
       Message.innerHTML = "That was close!";
       Message.style.color = "rgba(183, 138, 24, 0.821)";
       zone.querySelectorAll(".animation").forEach((animation) => {
@@ -291,5 +315,14 @@ DropZone.forEach((zone) =>
   })
 );
 
-// All arround funkcija pertvarkyti kad atskira funkcija rinktu ir grazintu masyva su aplinkiniais blokais
-// reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
+// DropZone.forEach((zone) => {
+//   zone.addEventListener("mouseover", (event) => {
+//     event.target.style.backgroundColor = "rgba(30, 69, 104)";
+//   });
+// });
+
+// DropZone.forEach((zone) => {
+//   zone.addEventListener("mouseout", (event) => {
+//     event.target.style.backgroundColor = "rgb(2, 43, 79)";
+//   });
+// });
