@@ -68,10 +68,14 @@ main {
     border: 1px solid greenyellow;
     background-color: rgb(2, 43, 79);
 
-    /* &:hover {
+    &:hover {
       background-color: rgba(30, 69, 104);
-    } */
+    }
   }
+}
+
+.drop-zone.dragover {
+  background-color: rgba(30, 69, 104);
 }
 
 .board::after {

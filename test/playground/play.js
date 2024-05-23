@@ -156,13 +156,15 @@ function AddPiece(ship) {
     i++;
   } while (shipBlocks.length != ship.length);
 
-  shipBlocks.forEach((block) => {
+  shipBlocks.forEach((block, i) => {
     block.classList.add(ship.name);
     block.classList.add("taken");
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
     AllAroundBlocks(ComputersBlock, block).forEach((blocks) => {
-      blocks.classList.add("takenArround");
+      if (blocks != shipBlocks[i + 1] && !blocks.classList.contains("taken")) {
+        blocks.classList.add("takenArround");
+      }
     });
   });
 }
@@ -213,7 +215,6 @@ function AddPlayerPiece(ship, startIndex) {
           ship.name
         )
       ) {
-        console.log(validBlock);
         shipBlocks.push(validBlock);
       } else {
         Message.innerHTML = "You cant place here";
@@ -228,13 +229,15 @@ function AddPlayerPiece(ship, startIndex) {
     i++;
   } while (shipBlocks.length != ship.length);
 
-  shipBlocks.forEach((block) => {
+  shipBlocks.forEach((block, i) => {
     block.classList.add(ship.name);
     block.classList.add("taken");
     block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
     AllAroundBlocks(AllPlayerBlocks, block).forEach((blocks) => {
-      blocks.classList.add("takenArround");
+      if (blocks != shipBlocks[i + 1] && !blocks.classList.contains("taken")) {
+        blocks.classList.add("takenArround");
+      }
     });
   });
 }
@@ -245,7 +248,8 @@ const AllPlayerShips = document.querySelectorAll(".ship");
 let draggedShip;
 
 //
-function shadowedDragBlock(arr, percentP, percentC) {
+function shadowedDragBlock(arr, percentP, percentC, etarget) {
+  console.log(UsedPlayerShipblocks);
   document.querySelector(".computer-board").style.opacity = percentC;
   arr.forEach((block) => {
     if (
@@ -254,27 +258,42 @@ function shadowedDragBlock(arr, percentP, percentC) {
     ) {
       block.style.opacity = percentP;
     }
+    const ship = AllShipsArray[etarget.id];
+    if (angle == 0 && (Number(block.dataset.id) % 10) + ship.length > 10) {
+      block.style.opacity = percentP;
+    } else if (
+      angle == 90 &&
+      Number(block.dataset.id) + ship.length * 10 >= 110
+    ) {
+      block.style.opacity = percentP;
+    }
   });
 }
 
 function dragStart(e) {
-  shadowedDragBlock(AllPlayerBlocks, "20%", "50%");
+  shadowedDragBlock(AllPlayerBlocks, "20%", "50%", e.target);
   notDropped = false;
   draggedShip = e.target;
 }
 
 function dragOver(e) {
   e.preventDefault();
-  console.log(e);
-  // e.target.style.backgroundColor = "rgba(30, 69, 104)";
+  if (e.target.classList.contains("drop-zone")) {
+    e.target.classList.add("dragover");
+  }
+}
+
+function dragEnd() {
+  AllPlayerBlocks.forEach((block) => (block.style.opacity = "100%"));
+  document.querySelector(".computer-board").style.opacity = "100%";
 }
 
 function dropShip(e) {
   const startId = Number(e.target.dataset.id);
   const ship = AllShipsArray[draggedShip.id];
-
   AddPlayerPiece(ship, startId);
-  shadowedDragBlock(AllPlayerBlocks, "100%", "100%");
+  e.target.classList.remove("dragover");
+  dragEnd();
   if (!notDropped) {
     draggedShip.remove();
   }
@@ -284,16 +303,22 @@ AllPlayerShips.forEach((optionShip) =>
   optionShip.addEventListener("dragstart", dragStart)
 );
 
+AllPlayerShips.forEach((optionShip) =>
+  optionShip.addEventListener("dragend", dragEnd)
+);
+
 AllPlayerBlocks.forEach((playerblock) => {
+  playerblock.addEventListener("dragend", (e) => {
+    console.log("labas");
+  });
   playerblock.addEventListener("dragover", dragOver);
   playerblock.addEventListener("drop", dropShip);
+  playerblock.addEventListener("dragleave", (e) => {
+    if (e.target.classList.contains("drop-zone")) {
+      e.target.classList.remove("dragover");
+    }
+  });
 });
-
-//add Highlight for blocks
-
-function HighlightAre(startIndex, index) {
-  AllPlayerBlocks;
-}
 
 //animation
 
@@ -315,14 +340,5 @@ DropZone.forEach((zone) =>
   })
 );
 
-// DropZone.forEach((zone) => {
-//   zone.addEventListener("mouseover", (event) => {
-//     event.target.style.backgroundColor = "rgba(30, 69, 104)";
-//   });
-// });
 
-// DropZone.forEach((zone) => {
-//   zone.addEventListener("mouseout", (event) => {
-//     event.target.style.backgroundColor = "rgb(2, 43, 79)";
-//   });
-// });
+//add piece perdaryti i computer ir player ir opacity
