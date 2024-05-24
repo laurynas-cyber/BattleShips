@@ -38,7 +38,6 @@ AllPlayerBlocks.forEach((block, i) => {
 
 FlipBtn.addEventListener("click", function () {
   angle = angle === 0 ? 90 : 0;
-  console.log(angle);
   AllShips.forEach((ship) => {
     ship.style.rotate = `${angle}deg`;
   });
@@ -249,7 +248,7 @@ let draggedShip;
 
 //
 function shadowedDragBlock(arr, percentP, percentC, etarget) {
-  console.log(UsedPlayerShipblocks);
+  const ship = AllShipsArray[etarget.id];
   document.querySelector(".computer-board").style.opacity = percentC;
   arr.forEach((block) => {
     if (
@@ -258,7 +257,7 @@ function shadowedDragBlock(arr, percentP, percentC, etarget) {
     ) {
       block.style.opacity = percentP;
     }
-    const ship = AllShipsArray[etarget.id];
+
     if (angle == 0 && (Number(block.dataset.id) % 10) + ship.length > 10) {
       block.style.opacity = percentP;
     } else if (
@@ -268,12 +267,51 @@ function shadowedDragBlock(arr, percentP, percentC, etarget) {
       block.style.opacity = percentP;
     }
   });
+
+  UsedPlayerShipblocks.forEach((block) => {
+    if (angle == 0) {
+      for (let i = 1; i <= ship.length; i++) {
+        let newIndexminus = Number(block.dataset.id) - i;
+        let newIndextenminus = newIndexminus - 10;
+        let newIndexplus = newIndexminus + 10;
+        if (AllPlayerBlocks[newIndexminus] != undefined) {
+          AllPlayerBlocks[newIndexminus].style.opacity = percentP;
+        }
+        if (AllPlayerBlocks[newIndextenminus] != undefined) {
+          AllPlayerBlocks[newIndextenminus].style.opacity = percentP;
+        }
+        if (AllPlayerBlocks[newIndexplus] != undefined) {
+          AllPlayerBlocks[newIndexplus].style.opacity = percentP;
+        }
+      }
+    } else if (angle == 90) {
+      for (let i = 1; i <= ship.length; i++) {
+        let newIndexminus = Number(block.dataset.id) - i * 10;
+        let newIndextenminus = newIndexminus - 1;
+        let newIndexplus = newIndexminus + 1;
+        if (AllPlayerBlocks[newIndexminus] != undefined) {
+          AllPlayerBlocks[newIndexminus].style.opacity = percentP;
+        }
+        if (AllPlayerBlocks[newIndextenminus] != undefined) {
+          AllPlayerBlocks[newIndextenminus].style.opacity = percentP;
+        }
+        if (
+          AllPlayerBlocks[newIndexplus].dataset.id % 10 != 0 || //reikia sufixinti
+          AllPlayerBlocks[newIndexplus] != undefined
+        ) {
+          console.log(AllPlayerBlocks[newIndexplus]);
+          AllPlayerBlocks[newIndexplus].style.opacity = percentP;
+        }
+      }
+    }
+  });
 }
 
 function dragStart(e) {
   shadowedDragBlock(AllPlayerBlocks, "20%", "50%", e.target);
   notDropped = false;
   draggedShip = e.target;
+  console.log(e.target);
 }
 
 function dragOver(e) {
@@ -299,18 +337,30 @@ function dropShip(e) {
   }
 }
 
-AllPlayerShips.forEach((optionShip) =>
-  optionShip.addEventListener("dragstart", dragStart)
-);
+// document.querySelectorAll("h5").forEach((h) => h.stopPropagation());
 
-AllPlayerShips.forEach((optionShip) =>
-  optionShip.addEventListener("dragend", dragEnd)
-);
+AllPlayerShips.forEach((optionShip) => {
+  optionShip.addEventListener("dragstart", (event) => {
+    event.stopPropagation(); // nedirba
+    dragStart(event);
+  });
+});
+
+AllPlayerShips.forEach((optionShip) => {
+  optionShip.addEventListener("dragend", (event) => {
+    // draggedShip.remove();
+    // notDropped = false;
+    event.stopPropagation(); // nedirba
+    dragEnd(event);
+    // event.preventDefault();
+  });
+});
+
+// AllPlayerShips.forEach((optionShip) =>
+//   optionShip.addEventListener("dragend", dragEnd)
+// );
 
 AllPlayerBlocks.forEach((playerblock) => {
-  playerblock.addEventListener("dragend", (e) => {
-    console.log("labas");
-  });
   playerblock.addEventListener("dragover", dragOver);
   playerblock.addEventListener("drop", dropShip);
   playerblock.addEventListener("dragleave", (e) => {
@@ -339,6 +389,5 @@ DropZone.forEach((zone) =>
     }
   })
 );
-
 
 //add piece perdaryti i computer ir player ir opacity
