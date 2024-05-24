@@ -10,6 +10,7 @@ const FlipBtn = document.querySelector(".btnFlip");
 const ComputersBlock = document.querySelectorAll(".computer-board div");
 const AllPlayerBlocks = document.querySelectorAll(".player-board div");
 const Message = document.querySelector(".message");
+const AllPlayerShips = document.querySelectorAll(".ship");
 // const AnimationNot = document.querySelector()
 
 let html = ` <div class="zone nothit">
@@ -57,8 +58,8 @@ const cruiser = new Ship("cruiser", 3);
 const battleship = new Ship("battleship", 4);
 const carrier = new Ship("carrier", 5);
 
-const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
-
+// const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
+const AllShipsArray = [carrier, battleship, cruiser, submarine, destroyer];
 // add ships
 
 function AllAroundBlocks(Boardblocks, block) {
@@ -242,7 +243,6 @@ function AddPlayerPiece(ship, startIndex) {
 }
 
 // drag
-const AllPlayerShips = document.querySelectorAll(".ship");
 
 let draggedShip;
 
@@ -296,10 +296,9 @@ function shadowedDragBlock(arr, percentP, percentC, etarget) {
           AllPlayerBlocks[newIndextenminus].style.opacity = percentP;
         }
         if (
-          AllPlayerBlocks[newIndexplus].dataset.id % 10 != 0 || //reikia sufixinti
-          AllPlayerBlocks[newIndexplus] != undefined
+          AllPlayerBlocks[newIndexplus] != undefined &&
+          Number(block.dataset.id) % 10 < 9
         ) {
-          console.log(AllPlayerBlocks[newIndexplus]);
           AllPlayerBlocks[newIndexplus].style.opacity = percentP;
         }
       }
@@ -337,12 +336,35 @@ function dropShip(e) {
   }
 }
 
-// document.querySelectorAll("h5").forEach((h) => h.stopPropagation());
+document.querySelectorAll("h5").forEach((h) =>
+  h.addEventListener("dragstart", (event) => {
+    event.stopPropagation();
+    event.bubbles = false;
+    console.log(event);
+    console.log(event.target);
+  })
+);
+
+document.querySelectorAll(".ship-container").forEach((h) =>
+  h.addEventListener("dragstart", (event) => {
+    event.stopPropagation();
+    console.log(event.target);
+  })
+);
+
+document
+  .querySelector(".option-container")
+  .addEventListener("dragstart", (event) => {
+    event.stopPropagation();
+    event.bubbles = false;
+    console.log(event);
+  });
 
 AllPlayerShips.forEach((optionShip) => {
   optionShip.addEventListener("dragstart", (event) => {
     event.stopPropagation(); // nedirba
     dragStart(event);
+    console.log(event.target); //nekonsolina kai dragginu uzrasa
   });
 });
 
@@ -358,11 +380,15 @@ AllPlayerShips.forEach((optionShip) => {
 
 // AllPlayerShips.forEach((optionShip) =>
 //   optionShip.addEventListener("dragend", dragEnd)
-// );
+// ); atkomentuoti
 
 AllPlayerBlocks.forEach((playerblock) => {
   playerblock.addEventListener("dragover", dragOver);
-  playerblock.addEventListener("drop", dropShip);
+  // playerblock.addEventListener("drop", dropShip); // atkomentuoti
+  playerblock.addEventListener("drop", (event) => {
+    event.stopPropagation(); // nedirba
+    dropShip(event);
+  });
   playerblock.addEventListener("dragleave", (e) => {
     if (e.target.classList.contains("drop-zone")) {
       e.target.classList.remove("dragover");
@@ -390,4 +416,5 @@ DropZone.forEach((zone) =>
   })
 );
 
-//add piece perdaryti i computer ir player ir opacity
+//add piece perdaryti i computer ir player
+// sutvarkyti bubblinima t.y. perkelti zodzius
