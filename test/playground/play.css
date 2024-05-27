@@ -178,6 +178,7 @@ button {
   align-items: center;
   overflow: hidden;
   box-sizing: border-box;
+  cursor: grab;
 }
 
 .destroyer-preview {
@@ -328,7 +329,7 @@ button {
   color: white;
   .fa-skull {
     color: rgb(139, 190, 69);
-    /* color: rgb(162, 188, 122); */
+    /* color: rgb(153, 186, 105); */
     scale: 2;
     animation-name: skull;
     animation-duration: 1.3s;

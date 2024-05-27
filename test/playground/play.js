@@ -1,3 +1,5 @@
+// https://web.dev/articles/drag-and-drop
+
 function rand(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -11,6 +13,7 @@ const ComputersBlock = document.querySelectorAll(".computer-board div");
 const AllPlayerBlocks = document.querySelectorAll(".player-board div");
 const Message = document.querySelector(".message");
 const AllPlayerShips = document.querySelectorAll(".ship");
+const StartBtn = document.querySelector(".btnStart");
 // const AnimationNot = document.querySelector()
 
 let html = ` <div class="zone nothit">
@@ -65,6 +68,11 @@ const carrier = new Ship("carrier", 5);
 // const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 const AllShipsArray = [carrier, battleship, cruiser, submarine, destroyer];
 // add ships
+
+function infoLine(message, color) {
+  Message.innerHTML = message;
+  Message.style.color = color;
+}
 
 function AllAroundBlocks(Boardblocks, block) {
   let numblockId = Number(block.dataset.id); // reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
@@ -182,8 +190,6 @@ AllShipsArray.forEach((ship) => AddPiece(ship));
 //player drop
 
 function AddPlayerPiece(ship, startIndex) {
-  Message.innerHTML = "Place your ship";
-  Message.style.color = "green";
   let validHoriz;
   let validBlock;
   let i = 0;
@@ -206,8 +212,7 @@ function AddPlayerPiece(ship, startIndex) {
       ) {
         shipBlocks.push(validBlock);
       } else {
-        Message.innerHTML = "You cant place here";
-        Message.style.color = "rgba(183, 138, 24, 0.821)";
+        infoLine("You cant place here", "rgba(183, 138, 24, 0.821)");
         notDropped = true;
         return false;
       }
@@ -224,8 +229,7 @@ function AddPlayerPiece(ship, startIndex) {
       ) {
         shipBlocks.push(validBlock);
       } else {
-        Message.innerHTML = "You cant place here";
-        Message.style.color = "rgba(183, 138, 24, 0.821)";
+        infoLine("You cant place here", "rgba(183, 138, 24, 0.821)");
         notDropped = true;
         return false;
       }
@@ -320,7 +324,8 @@ function dragStart(e) {
   shadowedDragBlock(AllPlayerBlocks, "20%", "50%", e.target);
   notDropped = false;
   draggedShip = e.target;
-  console.log(e.target);
+  // e.dataTransfer.effectAllowed = "move";
+  // e.dataTransfer.setData("playground/html", this.innerHTML);
 }
 
 function dragOver(e) {
@@ -336,69 +341,28 @@ function dragEnd() {
 }
 
 function dropShip(e) {
+  e.target.classList.remove("dragover");
   const startId = Number(e.target.dataset.id);
   const ship = AllShipsArray[draggedShip.id];
   AddPlayerPiece(ship, startId);
-  e.target.classList.remove("dragover");
   dragEnd();
   if (!notDropped) {
     draggedShip.remove();
+    draggedShip = null;
   }
 }
 
-document.querySelectorAll("h5").forEach((h) =>
-  h.addEventListener("dragstart", (event) => {
-    event.stopPropagation();
-    event.bubbles = false;
-    console.log(event);
-    console.log(event.target);
-  })
+AllPlayerShips.forEach((optionShip) =>
+  optionShip.addEventListener("dragstart", dragStart)
 );
 
-document.querySelectorAll(".ship-container").forEach((h) =>
-  h.addEventListener("dragstart", (event) => {
-    event.stopPropagation();
-    console.log(event.target);
-  })
+AllPlayerShips.forEach((optionShip) =>
+  optionShip.addEventListener("dragend", dragEnd)
 );
-
-document
-  .querySelector(".option-container")
-  .addEventListener("dragstart", (event) => {
-    event.stopPropagation();
-    event.bubbles = false;
-    console.log(event);
-  });
-
-AllPlayerShips.forEach((optionShip) => {
-  optionShip.addEventListener("dragstart", (event) => {
-    event.stopPropagation(); // nedirba
-    dragStart(event);
-    console.log(event.target); //nekonsolina kai dragginu uzrasa
-  });
-});
-
-AllPlayerShips.forEach((optionShip) => {
-  optionShip.addEventListener("dragend", (event) => {
-    // draggedShip.remove();
-    // notDropped = false;
-    event.stopPropagation(); // nedirba
-    dragEnd(event);
-    // event.preventDefault();
-  });
-});
-
-// AllPlayerShips.forEach((optionShip) =>
-//   optionShip.addEventListener("dragend", dragEnd)
-// ); atkomentuoti
 
 AllPlayerBlocks.forEach((playerblock) => {
   playerblock.addEventListener("dragover", dragOver);
-  // playerblock.addEventListener("drop", dropShip); // atkomentuoti
-  playerblock.addEventListener("drop", (event) => {
-    event.stopPropagation(); // nedirba
-    dropShip(event);
-  });
+  playerblock.addEventListener("drop", dropShip);
   playerblock.addEventListener("dragleave", (e) => {
     if (e.target.classList.contains("drop-zone")) {
       e.target.classList.remove("dragover");
@@ -408,28 +372,58 @@ AllPlayerBlocks.forEach((playerblock) => {
 
 //animation
 
-DropZone.forEach((zone) =>
-  zone.addEventListener("click", function () {
-    zone.innerHTML = html;
-    // zone.innerHTML = Hithtml;
-    if (CheckAroundTakenBlocks(zone)) {
-      zone.innerHTML = html;
-      Message.innerHTML = "That was close!";
-      Message.style.color = "rgba(183, 138, 24, 0.821)";
-      zone.querySelectorAll(".animation").forEach((animation) => {
-        animation.style.border = "2px solid rgb(162, 188, 122)";
-        // animation.style.border = "2px solid greenyellow";
-      });
-    } else {
-      Message.innerHTML = "Missed";
-      Message.style.color = "rgba(172, 255, 47, 0.471)";
-    }
-    if (CheckHitTakenBlocks(zone)) {
-      zone.innerHTML = Hithtml;
-      console.log(CheckHitTakenBlocks(zone));
-    }
-  })
-);
+// DropZone.forEach((zone) =>
+//   zone.addEventListener("click", function () {
+//     zone.innerHTML = html;
+//     // zone.innerHTML = Hithtml;
+//     if (CheckAroundTakenBlocks(zone)) {
+//       zone.innerHTML = html;
+//       infoLine("That was close!", "rgba(183, 138, 24, 0.821)");
+//       zone.querySelectorAll(".animation").forEach((animation) => {
+//         animation.style.border = "2px solid rgb(153, 186, 105)";
+//       });
+//     } else {
+//       infoLine("Missed", "rgba(172, 255, 47, 0.471)");
+//     }
+//     if (CheckHitTakenBlocks(zone)) {
+//       zone.innerHTML = Hithtml;
+//     }
+//   })
+// );
 
 //add piece perdaryti i computer ir player
-// sutvarkyti bubblinima t.y. perkelti zodzius
+
+//start game
+
+let PlayerTurn = true;
+
+function Player() {
+  ComputersBlock.forEach((zone) => {
+    if (PlayerTurn) {
+      zone.addEventListener("click", function () {
+        PlayerTurn = false;
+        zone.innerHTML = html;
+        if (CheckAroundTakenBlocks(zone)) {
+          infoLine("That was close!", "rgba(183, 138, 24, 0.821)");
+          zone.querySelectorAll(".animation").forEach((animation) => {
+            animation.style.border = "2px solid rgb(153, 186, 105)";
+          });
+        } else {
+          infoLine("Missed", "rgba(172, 255, 47, 0.471)");
+        }
+        if (CheckHitTakenBlocks(zone)) {
+          zone.innerHTML = Hithtml;
+        }
+        PlayerTurn = false;
+        Computer();
+      });
+    }
+  });
+}
+
+StartBtn.addEventListener("click", (event) => {
+  if (UsedPlayerShipblocks.length == 17) {
+    infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
+    Player();
+  }
+});
