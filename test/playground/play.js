@@ -20,6 +20,10 @@ let html = ` <div class="zone nothit">
   <div class="animationNot-delay2 animation"></div>
 </div>
 </div>`;
+
+let Hithtml = `<div class="zone hitSkull">
+<div class="skull"><i class="fa-solid fa-skull"></i></div>
+</div>`;
 let angle = 0;
 let UsedShipblocks = [];
 let UsedPlayerShipblocks = [];
@@ -97,12 +101,16 @@ function CheckAroundBlocksProduction(arr, shipName) {
 }
 
 function CheckAroundTakenBlocks(block) {
-  return block.classList.contains("takenArround"); //ieskojimui
+  return block.classList.contains("takenArround");
 }
 
 // function CheckAroundTakenBlocks(arr) {
 //   return arr.some((block) => block.classList.contains("taken")); //ieskojimui
 // }
+
+function CheckHitTakenBlocks(zone) {
+  return zone.classList.contains("taken"); //ieskojimui
+}
 
 function AddPiece(ship) {
   let RandomIndex = rand(0, 99);
@@ -176,7 +184,6 @@ AllShipsArray.forEach((ship) => AddPiece(ship));
 function AddPlayerPiece(ship, startIndex) {
   Message.innerHTML = "Place your ship";
   Message.style.color = "green";
-  // notDropped = false;
   let validHoriz;
   let validBlock;
   let i = 0;
@@ -292,7 +299,10 @@ function shadowedDragBlock(arr, percentP, percentC, etarget) {
         if (AllPlayerBlocks[newIndexminus] != undefined) {
           AllPlayerBlocks[newIndexminus].style.opacity = percentP;
         }
-        if (AllPlayerBlocks[newIndextenminus] != undefined) {
+        if (
+          AllPlayerBlocks[newIndextenminus] != undefined &&
+          Number(block.dataset.id) % 10 > 0
+        ) {
           AllPlayerBlocks[newIndextenminus].style.opacity = percentP;
         }
         if (
@@ -400,18 +410,23 @@ AllPlayerBlocks.forEach((playerblock) => {
 
 DropZone.forEach((zone) =>
   zone.addEventListener("click", function () {
-    console.log(zone);
-    console.log(CheckAroundTakenBlocks(zone));
     zone.innerHTML = html;
+    // zone.innerHTML = Hithtml;
     if (CheckAroundTakenBlocks(zone)) {
+      zone.innerHTML = html;
       Message.innerHTML = "That was close!";
       Message.style.color = "rgba(183, 138, 24, 0.821)";
       zone.querySelectorAll(".animation").forEach((animation) => {
-        animation.style.border = "2px solid rgba(183, 138, 24)";
+        animation.style.border = "2px solid rgb(162, 188, 122)";
+        // animation.style.border = "2px solid greenyellow";
       });
     } else {
       Message.innerHTML = "Missed";
       Message.style.color = "rgba(172, 255, 47, 0.471)";
+    }
+    if (CheckHitTakenBlocks(zone)) {
+      zone.innerHTML = Hithtml;
+      console.log(CheckHitTakenBlocks(zone));
     }
   })
 );

@@ -323,3 +323,39 @@ button {
     height: 0%;
   }
 }
+
+.skull {
+  color: white;
+  .fa-skull {
+    color: rgb(139, 190, 69);
+    /* color: rgb(162, 188, 122); */
+    scale: 2;
+    animation-name: skull;
+    animation-duration: 1.3s;
+    animation-iteration-count: 1;
+    /* animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1); */
+    animation-timing-function: ease-out;
+  }
+}
+
+@keyframes skull {
+  0% {
+    scale: 0.2;
+  }
+
+  50% {
+    scale: 3;
+  }
+
+  60% {
+    scale: 2;
+  }
+
+  80% {
+    scale: 3;
+  }
+
+  100% {
+    scale: 2;
+  }
+}
