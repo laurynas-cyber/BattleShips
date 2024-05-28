@@ -32,6 +32,8 @@ let UsedShipblocks = [];
 let UsedPlayerShipblocks = [];
 let notDropped;
 
+let timerId;
+
 //give every field Id
 
 ComputersBlock.forEach((block, i) => {
@@ -65,7 +67,6 @@ const cruiser = new Ship("cruiser", 3);
 const battleship = new Ship("battleship", 4);
 const carrier = new Ship("carrier", 5);
 
-// const AllShipsArray = [destroyer, submarine, cruiser, battleship, carrier];
 const AllShipsArray = [carrier, battleship, cruiser, submarine, destroyer];
 // add ships
 
@@ -350,6 +351,21 @@ function dropShip(e) {
     draggedShip.remove();
     draggedShip = null;
   }
+  if (UsedPlayerShipblocks.length == 17) {
+    infoLine("Press START to begin the game", "rgba(172, 255, 47, 0.471)");
+    timerId = setInterval((_) => {
+      StartBtn.style.color =
+        StartBtn.style.color == "yellowgreen"
+          ? "rgba(172, 255, 47, 0.0)"
+          : "yellowgreen";
+    }, 800);
+    // setInterval((_) => {
+    //   StartBtn.style.color =
+    //     StartBtn.style.color == "yellowgreen"
+    //       ? "rgba(172, 255, 47, 0.0)"
+    //       : "yellowgreen";
+    // }, 800);
+  }
 }
 
 AllPlayerShips.forEach((optionShip) =>
@@ -397,33 +413,72 @@ AllPlayerBlocks.forEach((playerblock) => {
 
 let PlayerTurn = true;
 
+function Computer() {
+  setTimeout((_) => {
+    let RandomIndex = rand(0, 99);
+    PlayerTurn = true;
+    AllPlayerBlocks[RandomIndex].innerHTML = html;
+  }, 2000);
+}
+
 function Player() {
   ComputersBlock.forEach((zone) => {
     if (PlayerTurn) {
       zone.addEventListener("click", function () {
-        PlayerTurn = false;
-        zone.innerHTML = html;
-        if (CheckAroundTakenBlocks(zone)) {
+        if (
+          CheckAroundTakenBlocks(zone) &&
+          !zone.classList.contains("--used") &&
+          PlayerTurn == true
+        ) {
+          PlayerTurn = false;
+          zone.innerHTML = html;
+          zone.classList.add("--used");
           infoLine("That was close!", "rgba(183, 138, 24, 0.821)");
           zone.querySelectorAll(".animation").forEach((animation) => {
             animation.style.border = "2px solid rgb(153, 186, 105)";
           });
-        } else {
-          infoLine("Missed", "rgba(172, 255, 47, 0.471)");
-        }
-        if (CheckHitTakenBlocks(zone)) {
+
+          return Computer();
+        } else if (
+          !zone.classList.contains("--used") &&
+          CheckHitTakenBlocks(zone) &&
+          PlayerTurn == true
+        ) {
+          AllShipsArray.forEach((ship) => {
+            if (zone.classList.contains(ship.name)) {
+              console.log(ship.name);
+              infoLine(
+                `You got his ${ship.name}!`,
+                "rgba(183, 138, 24, 0.821)"
+              );
+            }
+          });
+          PlayerTurn = false;
+          zone.classList.add("--used");
           zone.innerHTML = Hithtml;
+          console.log(zone);
+          return Computer();
+        } else if (!zone.classList.contains("--used") && PlayerTurn == true) {
+          PlayerTurn = false;
+          zone.classList.add("--used");
+          zone.innerHTML = html;
+          infoLine("Missed", "rgba(255, 255, 255, 0.666)");
+
+          return Computer();
         }
-        PlayerTurn = false;
-        Computer();
       });
     }
   });
 }
 
+Player();
+// GameStart();
+
 StartBtn.addEventListener("click", (event) => {
   if (UsedPlayerShipblocks.length == 17) {
     infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
-    Player();
+    clearInterval(timerId);
+    StartBtn.style.color = "yellowgreen";
+    // Player();
   }
 });
