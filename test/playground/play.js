@@ -79,7 +79,7 @@ function infoLine(message, color, turn = "Player's") {
 }
 
 function AllAroundBlocks(Boardblocks, block) {
-  let numblockId = Number(block.dataset.id); // reikia nustatyi ar bus user ar computer arba kompui padaryti irgi data set id
+  let numblockId = Number(block.dataset.id);
   let allAroundBlock = [];
   if (numblockId % 10 != 9 && numblockId % 10 != 0) {
     allAroundBlock.push(Boardblocks[numblockId + 1]);
@@ -104,6 +104,9 @@ function AllAroundBlocks(Boardblocks, block) {
     allAroundBlock.push(Boardblocks[numblockId + 1 * 10 - 1]);
   }
   allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
+  allAroundBlock = allAroundBlock.filter(
+    (block) => !block.classList.contains("used")
+  );
   return allAroundBlock;
 }
 
@@ -179,7 +182,7 @@ function AddPiece(ship) {
   shipBlocks.forEach((block, i) => {
     block.classList.add(ship.name);
     block.classList.add("taken");
-    block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
+    // block.classList.remove("drop-zone"); // reikes istrinti kai baigsiu daryt computer
     block.style.border = "1px solid greenyellow";
     AllAroundBlocks(ComputersBlock, block).forEach((blocks) => {
       if (blocks != shipBlocks[i + 1] && !blocks.classList.contains("taken")) {
@@ -408,12 +411,54 @@ AllPlayerBlocks.forEach((playerblock) => {
 
 //start game
 
+function AllAroundLuckyCrossBlocks(Boardblocks, block) {
+  let numblockId = Number(block.dataset.id);
+  let allAroundBlock = [];
+  if (numblockId % 10 != 9 && numblockId % 10 != 0) {
+    allAroundBlock.push(Boardblocks[numblockId + 1]);
+    allAroundBlock.push(Boardblocks[numblockId - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+  } else if (numblockId % 10 == 0) {
+    allAroundBlock.push(Boardblocks[numblockId + 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+  } else if (numblockId % 10 == 9) {
+    allAroundBlock.push(Boardblocks[numblockId - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+  }
+  allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
+  allAroundBlock = allAroundBlock.filter(
+    (block) => !block.classList.contains("used")
+  );
+  return allAroundBlock;
+}
+
 let PlayerTurn = true;
 let Gameover = false;
+let lastComputerLuckyHit = "";
+let ComputerhitShip = false; //if last ship sunked
+
+function ComputersNextMove(LuckyBlock) {
+  let nextIndex;
+  let arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, LuckyBlock);
+  let arr2 = AllAroundBlocks(AllPlayerBlocks, LuckyBlock);
+  if (ComputerhitShip) {
+    console.log(nextIndex);
+    return (nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id);
+  } else {
+    let randomMove = [arr1, arr2][rand(0, 1)];
+    nextIndex = randomMove[rand(0, randomMove.length - 1)].dataset.id;
+    return nextIndex;
+  }
+}
 
 function Computer() {
   setTimeout((_) => {
-    let RandomIndex = rand(0, 99);
+    let RandomIndex = !!lastComputerLuckyHit
+      ? ComputersNextMove(lastComputerLuckyHit)
+      : rand(0, 99);
     let zone = AllPlayerBlocks[RandomIndex];
 
     if (
@@ -421,6 +466,7 @@ function Computer() {
       !zone.classList.contains("--used") &&
       !Gameover
     ) {
+      lastComputerLuckyHit = !!ComputerhitShip ? lastComputerLuckyHit : zone;
       console.log(zone, RandomIndex, "C turn");
       zone.innerHTML = html;
       zone.classList.add("--used");
@@ -433,9 +479,12 @@ function Computer() {
       CheckHitTakenBlocks(zone) &&
       !Gameover
     ) {
+      lastComputerLuckyHit = zone;
+      ComputerhitShip = true;
       AllShipsArray.forEach((ship) => {
         if (zone.classList.contains(ship.name)) {
           ComputerTrophies.push(ship.name);
+
           let hitSum = ComputerTrophies.filter((word) => word == ship.name);
           if (ComputerTrophies.length == UsedShipblocks.length) {
             infoLine(
@@ -445,17 +494,21 @@ function Computer() {
             );
             return (Gameover = true);
           } else if (hitSum.length == ship.length) {
+            ComputerhitShip = false;
+            lastComputerLuckyHit = "";
             infoLine(
               `Computer sunk your ${ship.name}!`,
               "rgb(81, 27, 20)",
               "Computer's"
             );
-          } else
-            infoLine(
-              `Your ${ship.name} was damaged`,
-              "rgba(183, 138, 24, 0.821)",
-              "Computer's"
-            );
+          } else lastComputerLuckyHit = zone;
+
+          ComputerhitShip = true;
+          infoLine(
+            `Your ${ship.name} was damaged`,
+            "rgba(183, 138, 24, 0.821)",
+            "Computer's"
+          );
         }
       });
       console.log(zone, RandomIndex, "C turn");
