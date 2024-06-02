@@ -438,7 +438,8 @@ function AllAroundLuckyCrossBlocks(Boardblocks, block) {
 let PlayerTurn = true;
 let Gameover = false;
 let lastComputerLuckyHit = "";
-let ComputerhitShip = false; //if last ship sunked
+let lastSavedZone;
+let FirstShot = true;
 
 function ComputersNextMove(LuckyBlock) {
   let nextIndex;
@@ -446,83 +447,326 @@ function ComputersNextMove(LuckyBlock) {
   let arr2 = AllAroundBlocks(AllPlayerBlocks, LuckyBlock);
   if (ComputerhitShip) {
     console.log(nextIndex);
-    return (nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id);
+    nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
+    if (nextIndex == undefined) {
+      return (lastComputerLuckyHit = "");
+    } else return nextIndex;
   } else {
-    let randomMove = [arr1, arr2][rand(0, 1)];
-    nextIndex = randomMove[rand(0, randomMove.length - 1)].dataset.id;
-    return nextIndex;
+    console.log(nextIndex);
+    nextIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
+    if (nextIndex == undefined) {
+      return (lastComputerLuckyHit = "");
+    } else return nextIndex;
   }
+}
+
+function Randomhit() {
+  let RandomIndex;
+  let zone;
+
+  do {
+    RandomIndex = rand(0, 99);
+    zone = AllPlayerBlocks[RandomIndex];
+  } while (zone.classList.contains("--used"));
+
+  // &&
+  //   !zone.classList.contains("--used") &&
+  //   !Gameover jeigu neveiks ifuose prideti sias salygas
+  if (CheckAroundTakenBlocks(zone)) {
+    lastComputerLuckyHit = "lucky";
+    lastSavedZone = zone;
+    zone.innerHTML = html;
+    zone.classList.add("--used");
+    infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
+    zone.querySelectorAll(".animation").forEach((animation) => {
+      animation.style.border = "2px solid rgb(153, 186, 105)";
+    });
+  } else if (CheckHitTakenBlocks(zone)) {
+    AllShipsArray.forEach((ship) => {
+      if (zone.classList.contains(ship.name)) {
+        ComputerTrophies.push(ship.name);
+
+        let hitSum = ComputerTrophies.filter((word) => word == ship.name);
+        if (ComputerTrophies.length == UsedShipblocks.length) {
+          infoLine(
+            `Computer sunk all your ships, you lost!`,
+            "rgb(81, 27, 20)",
+            "Computer's"
+          );
+          return (Gameover = true);
+        } else if (hitSum.length == ship.length) {
+          lastComputerLuckyHit = "";
+          infoLine(
+            `Computer sunk your ${ship.name}!`,
+            "rgb(81, 27, 20)",
+            "Computer's"
+          );
+        } else lastComputerLuckyHit = "hit";
+        infoLine(
+          `Your ${ship.name} was damaged`,
+          "rgba(183, 138, 24, 0.821)",
+          "Computer's"
+        );
+      }
+    });
+    lastSavedZone = zone;
+    zone.classList.add("--used");
+    zone.innerHTML = Hithtml;
+  } else if (!zone.classList.contains("--used") && !Gameover) {
+    zone.classList.add("--used");
+    zone.innerHTML = html;
+    infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
+  } else return Computer();
+  PlayerTurn = true;
+}
+
+function Luckyhit(SavedZone) {
+  let arr2 = AllAroundBlocks(AllPlayerBlocks, SavedZone);
+  let RandomIndex;
+  let zone;
+
+  do {
+    RandomIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
+    zone = AllPlayerBlocks[RandomIndex];
+  } while (zone.classList.contains("--used"));
+
+  let arr2Check = arr2.some(
+    (block) =>
+      block.classList.contains("taken") && !block.classList.contains("--used")
+  );
+
+  if (CheckAroundTakenBlocks(zone)) {
+    lastComputerLuckyHit = "lucky";
+    lastSavedZone = !!arr2Check ? SavedZone : zone;
+    // lastSavedZone = zone;
+    zone.innerHTML = html;
+    zone.classList.add("--used");
+    infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
+    zone.querySelectorAll(".animation").forEach((animation) => {
+      animation.style.border = "2px solid rgb(153, 186, 105)";
+    });
+  } else if (CheckHitTakenBlocks(zone)) {
+    AllShipsArray.forEach((ship) => {
+      if (zone.classList.contains(ship.name)) {
+        ComputerTrophies.push(ship.name);
+
+        let hitSum = ComputerTrophies.filter((word) => word == ship.name);
+        if (ComputerTrophies.length == UsedShipblocks.length) {
+          infoLine(
+            `Computer sunk all your ships, you lost!`,
+            "rgb(81, 27, 20)",
+            "Computer's"
+          );
+          return (Gameover = true);
+        } else if (hitSum.length == ship.length) {
+          lastComputerLuckyHit = "";
+          infoLine(
+            `Computer sunk your ${ship.name}!`,
+            "rgb(81, 27, 20)",
+            "Computer's"
+          );
+        } else lastComputerLuckyHit = "hit";
+
+        infoLine(
+          `Your ${ship.name} was damaged`,
+          "rgba(183, 138, 24, 0.821)",
+          "Computer's"
+        );
+      }
+    });
+    lastSavedZone = zone;
+    console.log(lastSavedZone);
+    zone.classList.add("--used");
+    zone.innerHTML = Hithtml;
+  } else if (!zone.classList.contains("--used") && !Gameover) {
+    zone.classList.add("--used");
+    zone.innerHTML = html;
+    infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
+  } else return Computer();
+  PlayerTurn = true;
+}
+
+function Shiphit(SavedZone) {
+  let arr1;
+  let RandomIndex;
+  let zone;
+  // if (FirstShot) {
+  //   arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
+  // }
+  console.log(lastSavedZone);
+  arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
+  arr1 = arr1.filter((block) => !block.classList.contains("--used"));
+  if (arr1 == []) {
+    return Randomhit();
+  }
+
+  RandomIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
+  zone = AllPlayerBlocks[RandomIndex];
+
+  if (CheckAroundTakenBlocks(zone)) {
+    lastComputerLuckyHit = "lucky";
+    lastSavedZone = lastSavedZone;
+    zone.innerHTML = html;
+    zone.classList.add("--used");
+    infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
+    zone.querySelectorAll(".animation").forEach((animation) => {
+      animation.style.border = "2px solid rgb(153, 186, 105)";
+    });
+  } else if (CheckHitTakenBlocks(zone)) {
+    AllShipsArray.forEach((ship) => {
+      if (zone.classList.contains(ship.name)) {
+        ComputerTrophies.push(ship.name);
+        let hitSum = ComputerTrophies.filter((word) => word == ship.name);
+        if (ComputerTrophies.length == UsedShipblocks.length) {
+          infoLine(
+            `Computer sunk all your ships, you lost!`,
+            "rgb(81, 27, 20)",
+            "Computer's"
+          );
+          return (Gameover = true);
+        } else if (hitSum.length == ship.length) {
+          lastComputerLuckyHit = "";
+          infoLine(
+            `Computer sunk your ${ship.name}!`,
+            "rgb(81, 27, 20)",
+            "Computer's"
+          );
+        } else lastComputerLuckyHit = "hit";
+        infoLine(
+          `Your ${ship.name} was damaged`,
+          "rgba(183, 138, 24, 0.821)",
+          "Computer's"
+        );
+      }
+    });
+    lastSavedZone = zone;
+    zone.classList.add("--used");
+    zone.innerHTML = Hithtml;
+  } else if (!zone.classList.contains("--used") && !Gameover) {
+    zone.classList.add("--used");
+    zone.innerHTML = html;
+    infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
+  } else return Computer();
+  PlayerTurn = true;
 }
 
 function Computer() {
   setTimeout((_) => {
-    let RandomIndex = !!lastComputerLuckyHit
-      ? ComputersNextMove(lastComputerLuckyHit)
-      : rand(0, 99);
-    let zone = AllPlayerBlocks[RandomIndex];
+    let CompNextMove;
 
-    if (
-      CheckAroundTakenBlocks(zone) &&
-      !zone.classList.contains("--used") &&
-      !Gameover
-    ) {
-      lastComputerLuckyHit = !!ComputerhitShip ? lastComputerLuckyHit : zone;
-      console.log(zone, RandomIndex, "C turn");
-      zone.innerHTML = html;
-      zone.classList.add("--used");
-      infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
-      zone.querySelectorAll(".animation").forEach((animation) => {
-        animation.style.border = "2px solid rgb(153, 186, 105)";
-      });
-    } else if (
-      !zone.classList.contains("--used") &&
-      CheckHitTakenBlocks(zone) &&
-      !Gameover
-    ) {
-      lastComputerLuckyHit = zone;
-      ComputerhitShip = true;
-      AllShipsArray.forEach((ship) => {
-        if (zone.classList.contains(ship.name)) {
-          ComputerTrophies.push(ship.name);
+    switch (lastComputerLuckyHit) {
+      case "": {
+        console.log("rand");
 
-          let hitSum = ComputerTrophies.filter((word) => word == ship.name);
-          if (ComputerTrophies.length == UsedShipblocks.length) {
-            infoLine(
-              `Computer sunk all your ships, you lost!`,
-              "rgb(81, 27, 20)",
-              "Computer's"
-            );
-            return (Gameover = true);
-          } else if (hitSum.length == ship.length) {
-            ComputerhitShip = false;
-            lastComputerLuckyHit = "";
-            infoLine(
-              `Computer sunk your ${ship.name}!`,
-              "rgb(81, 27, 20)",
-              "Computer's"
-            );
-          } else lastComputerLuckyHit = zone;
+        CompNextMove = Randomhit();
+        break;
+      }
+      case "lucky": {
+        console.log("luck");
+        console.log(lastSavedZone);
+        CompNextMove = Luckyhit(lastSavedZone);
+        break;
+      }
+      case "hit": {
+        console.log(lastSavedZone);
+        console.log("hit");
+        CompNextMove = Shiphit(lastSavedZone);
+        break;
+      }
+    }
 
-          ComputerhitShip = true;
-          infoLine(
-            `Your ${ship.name} was damaged`,
-            "rgba(183, 138, 24, 0.821)",
-            "Computer's"
-          );
-        }
-      });
-      console.log(zone, RandomIndex, "C turn");
-      zone.classList.add("--used");
-      zone.innerHTML = Hithtml;
-    } else if (!zone.classList.contains("--used") && !Gameover) {
-      zone.classList.add("--used");
-      console.log(zone, RandomIndex, "C turn");
-      zone.innerHTML = html;
-      infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
-    } else return Computer();
-    PlayerTurn = true;
+    return CompNextMove;
   }, 2000);
 }
+
+// function ComputersNextMove(LuckyBlock) {
+//   let nextIndex;
+//   let arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, LuckyBlock);
+//   let arr2 = AllAroundBlocks(AllPlayerBlocks, LuckyBlock);
+//   if (ComputerhitShip) {
+//     console.log(nextIndex);
+//     nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
+//     if (nextIndex == undefined) {
+//       return (lastComputerLuckyHit = "");
+//     } else return nextIndex;
+//   } else {
+//     console.log(nextIndex);
+//     nextIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
+//     if (nextIndex == undefined) {
+//       return (lastComputerLuckyHit = "");
+//     } else return nextIndex;
+//   }
+// }
+
+// function Computer() {
+//   setTimeout((_) => {
+//     let RandomIndex = !!lastComputerLuckyHit
+//       ? ComputersNextMove(lastComputerLuckyHit)
+//       : rand(0, 99);
+//     let zone = AllPlayerBlocks[RandomIndex];
+
+//     if (
+//       CheckAroundTakenBlocks(zone) &&
+//       !zone.classList.contains("--used") &&
+//       !Gameover
+//     ) {
+//       lastComputerLuckyHit = !!ComputerhitShip ? lastComputerLuckyHit : zone;
+//       console.log(zone, RandomIndex, "C turn");
+//       zone.innerHTML = html;
+//       zone.classList.add("--used");
+//       infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
+//       zone.querySelectorAll(".animation").forEach((animation) => {
+//         animation.style.border = "2px solid rgb(153, 186, 105)";
+//       });
+//     } else if (
+//       !zone.classList.contains("--used") &&
+//       CheckHitTakenBlocks(zone) &&
+//       !Gameover
+//     ) {
+//       lastComputerLuckyHit = zone;
+//       ComputerhitShip = true;
+//       AllShipsArray.forEach((ship) => {
+//         if (zone.classList.contains(ship.name)) {
+//           ComputerTrophies.push(ship.name);
+
+//           let hitSum = ComputerTrophies.filter((word) => word == ship.name);
+//           if (ComputerTrophies.length == UsedShipblocks.length) {
+//             infoLine(
+//               `Computer sunk all your ships, you lost!`,
+//               "rgb(81, 27, 20)",
+//               "Computer's"
+//             );
+//             return (Gameover = true);
+//           } else if (hitSum.length == ship.length) {
+//             ComputerhitShip = false;
+//             lastComputerLuckyHit = "";
+//             infoLine(
+//               `Computer sunk your ${ship.name}!`,
+//               "rgb(81, 27, 20)",
+//               "Computer's"
+//             );
+//           } else lastComputerLuckyHit = zone;
+
+//           ComputerhitShip = true;
+//           infoLine(
+//             `Your ${ship.name} was damaged`,
+//             "rgba(183, 138, 24, 0.821)",
+//             "Computer's"
+//           );
+//         }
+//       });
+//       console.log(zone, RandomIndex, "C turn");
+//       zone.classList.add("--used");
+//       zone.innerHTML = Hithtml;
+//     } else if (!zone.classList.contains("--used") && !Gameover) {
+//       zone.classList.add("--used");
+//       console.log(zone, RandomIndex, "C turn");
+//       zone.innerHTML = html;
+//       infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
+//     } else return Computer();
+//     PlayerTurn = true;
+//   }, 2000);
+// }
 
 function Player() {
   ComputersBlock.forEach((zone) => {
