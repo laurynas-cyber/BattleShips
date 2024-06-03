@@ -440,6 +440,7 @@ let Gameover = false;
 let lastComputerLuckyHit = "";
 let lastSavedZone;
 let FirstShot = true;
+let sessionHit = { TrophiesLenght: 0, Trophies: [] };
 
 function ComputersNextMove(LuckyBlock) {
   let nextIndex;
@@ -460,14 +461,19 @@ function ComputersNextMove(LuckyBlock) {
   }
 }
 
-function Randomhit() {
-  let RandomIndex;
+function randUnusedZone() {
   let zone;
-
   do {
-    RandomIndex = rand(0, 99);
-    zone = AllPlayerBlocks[RandomIndex];
+    zone = AllPlayerBlocks[rand(0, 99)];
+    console.log("randFunk", zone);
   } while (zone.classList.contains("--used"));
+  return zone;
+}
+function Randomhit() {
+  sessionHit = {};
+  sessionHit.TrophiesLenght = 0;
+  sessionHit.Trophies = [];
+  let zone = randUnusedZone();
 
   // &&
   //   !zone.classList.contains("--used") &&
@@ -507,8 +513,13 @@ function Randomhit() {
           "rgba(183, 138, 24, 0.821)",
           "Computer's"
         );
+        sessionHit.Name = ship.name;
+        sessionHit.Shiplength = ship.length;
+        sessionHit.TrophiesLenght += 1;
+        sessionHit.Trophies.push(zone);
       }
     });
+    FirstShot = true;
     lastSavedZone = zone;
     zone.classList.add("--used");
     zone.innerHTML = Hithtml;
@@ -524,11 +535,14 @@ function Luckyhit(SavedZone) {
   let arr2 = AllAroundBlocks(AllPlayerBlocks, SavedZone);
   let RandomIndex;
   let zone;
+  arr2 = arr2.filter((block) => !block.classList.contains("--used"));
 
-  do {
-    RandomIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
-    zone = AllPlayerBlocks[RandomIndex];
-  } while (zone.classList.contains("--used"));
+  RandomIndex = Number(arr2[rand(0, arr2.length - 1)].dataset.id);
+  if (arr2 == [] || !RandomIndex) {
+    return Randomhit();
+  }
+
+  zone = AllPlayerBlocks[RandomIndex];
 
   let arr2Check = arr2.some(
     (block) =>
@@ -537,7 +551,7 @@ function Luckyhit(SavedZone) {
 
   if (CheckAroundTakenBlocks(zone)) {
     lastComputerLuckyHit = "lucky";
-    lastSavedZone = !!arr2Check ? SavedZone : zone;
+    lastSavedZone = !!arr2Check ? SavedZone : randUnusedZone();
     // lastSavedZone = zone;
     zone.innerHTML = html;
     zone.classList.add("--used");
@@ -572,6 +586,10 @@ function Luckyhit(SavedZone) {
           "rgba(183, 138, 24, 0.821)",
           "Computer's"
         );
+        sessionHit.Name = ship.name;
+        sessionHit.Shiplength = ship.length;
+        sessionHit.Trophies.push(zone);
+        sessionHit.TrophiesLenght += 1;
       }
     });
     lastSavedZone = zone;
@@ -590,21 +608,69 @@ function Shiphit(SavedZone) {
   let arr1;
   let RandomIndex;
   let zone;
-  // if (FirstShot) {
-  //   arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
-  // }
-  console.log(lastSavedZone);
-  arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
-  arr1 = arr1.filter((block) => !block.classList.contains("--used"));
-  if (arr1 == []) {
+  let differ;
+  if (sessionHit.TrophiesLenght > 1) {
+    differ =
+      Number(sessionHit.Trophies[0].dataset.id) -
+      Number(sessionHit.Trophies[1].dataset.id);
+
+    RandomIndex = Number(SavedZone.dataset.id) - differ;
+    console.log(lastSavedZone, differ, RandomIndex);
+    // if (
+    //   AllPlayerBlocks[RandomIndex].classList.contains("--used") &&
+    //   sessionHit.Trophies.some((block) => block == AllPlayerBlocks[RandomIndex])
+    // ) {
+    //   let NextHits = UsedPlayerShipblocks.filter(
+    //     (word) => word == word.classList.contains(`${sessionHit.Name}`)
+    //   );
+    //   NextHits = NextHits.filter(
+    //     (block) => !block.classList.contains("--used")
+    //   );
+    //   // if (NextHits == []) {
+    //   //   return Randomhit();
+    //   // }
+    //   NextHits.map((block) => (block = Number(block.dataset.id)));
+    //   console.log("NEXT", NextHits);
+    //   RandomIndex = NextHits[rand(0, NextHits.length - 1)];
+    // } else
+    if (
+      AllPlayerBlocks[RandomIndex].classList.contains("--used") ||
+      AllPlayerBlocks[RandomIndex] == undefined
+    ) {
+      RandomIndex = Number(sessionHit.Trophies[0].dataset.id) + differ;
+      if (AllPlayerBlocks[RandomIndex].classList.contains("--used")) {
+        let arr = AllAroundBlocks(
+          AllPlayerBlocks,
+          AllPlayerBlocks[RandomIndex]
+        );
+        arr = arr.filter((block) => block.classList.contains("taken"));
+        RandomIndex = Number(arr[0].dataset.id);
+      }
+    }
+  } else {
+    arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
+    arr1 = arr1.filter((block) => !block.classList.contains("--used"));
+    if (arr1 == []) {
+      return Randomhit();
+    }
+    RandomIndex = Number(arr1[rand(0, arr1.length - 1)].dataset.id);
+  }
+
+  zone = AllPlayerBlocks[RandomIndex];
+  if (!RandomIndex || !zone) {
+    console.log("Nesamone");
+    lastComputerLuckyHit = "lucky";
+    return Luckyhit(SavedZone);
+  }
+
+  if (sessionHit.TrophiesLenght == sessionHit.Shiplength) {
+    console.log("samone");
     return Randomhit();
   }
 
-  RandomIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
-  zone = AllPlayerBlocks[RandomIndex];
-
   if (CheckAroundTakenBlocks(zone)) {
-    lastComputerLuckyHit = "lucky";
+    FirstShot = true;
+    lastComputerLuckyHit = "hit";
     lastSavedZone = lastSavedZone;
     zone.innerHTML = html;
     zone.classList.add("--used");
@@ -637,6 +703,18 @@ function Shiphit(SavedZone) {
           "rgba(183, 138, 24, 0.821)",
           "Computer's"
         );
+        //
+        sessionHit.Name = ship.name;
+        sessionHit.Shiplength = ship.length;
+        sessionHit.Trophies.push(zone);
+        sessionHit.TrophiesLenght += 1;
+        if (sessionHit.TrophiesLenght == sessionHit.Shiplength) {
+          sessionHit.Trophies.forEach((blockShip) => {
+            AllAroundBlocks(AllPlayerBlocks, blockShip).forEach((block) =>
+              block.classList.add("--used")
+            );
+          });
+        }
       }
     });
     lastSavedZone = zone;
@@ -653,7 +731,7 @@ function Shiphit(SavedZone) {
 function Computer() {
   setTimeout((_) => {
     let CompNextMove;
-
+    console.log(sessionHit);
     switch (lastComputerLuckyHit) {
       case "": {
         console.log("rand");
