@@ -331,8 +331,6 @@ function dragStart(e) {
   shadowedDragBlock(AllPlayerBlocks, "20%", "50%", e.target);
   notDropped = false;
   draggedShip = e.target;
-  // e.dataTransfer.effectAllowed = "move";
-  // e.dataTransfer.setData("playground/html", this.innerHTML);
 }
 
 function dragOver(e) {
@@ -347,6 +345,7 @@ function dragEnd() {
   document.querySelector(".computer-board").style.opacity = "100%";
 }
 
+let gameStart = false;
 function dropShip(e) {
   e.target.classList.remove("dragover");
   const startId = Number(e.target.dataset.id);
@@ -358,6 +357,8 @@ function dropShip(e) {
     draggedShip = null;
   }
   if (UsedPlayerShipblocks.length == 17) {
+    gameStart = true;
+    console.log(gameStart);
     infoLine("Press START to begin the game", "rgba(172, 255, 47, 0.471)");
     timerId = setInterval((_) => {
       StartBtn.style.color =
@@ -365,6 +366,17 @@ function dropShip(e) {
           ? "rgba(172, 255, 47, 0.0)"
           : "yellowgreen";
     }, 800);
+    StartBtn.addEventListener(
+      "click",
+      (event) => {
+        console.log("clicked");
+        infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
+        clearInterval(timerId);
+        StartBtn.style.color = "yellowgreen";
+        Player();
+      },
+      { once: true }
+    );
   }
 }
 
@@ -388,28 +400,28 @@ AllPlayerBlocks.forEach((playerblock) => {
 
 //animation
 
-// DropZone.forEach((zone) =>
-//   zone.addEventListener("click", function () {
-//     zone.innerHTML = html;
-//     // zone.innerHTML = Hithtml;
-//     if (CheckAroundTakenBlocks(zone)) {
-//       zone.innerHTML = html;
-//       infoLine("That was close!", "rgba(183, 138, 24, 0.821)");
-//       zone.querySelectorAll(".animation").forEach((animation) => {
-//         animation.style.border = "2px solid rgb(153, 186, 105)";
-//       });
-//     } else {
-//       infoLine("Missed", "rgba(172, 255, 47, 0.471)");
-//     }
-//     if (CheckHitTakenBlocks(zone)) {
-//       zone.innerHTML = Hithtml;
-//     }
-//   })
-// );
-
 //add piece perdaryti i computer ir player
 
 //start game
+
+// function ComputersNextMove(LuckyBlock) {
+//   let nextIndex;
+//   let arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, LuckyBlock);
+//   let arr2 = AllAroundBlocks(AllPlayerBlocks, LuckyBlock);
+//   if (ComputerhitShip) {
+//     console.log(nextIndex);
+//     nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
+//     if (nextIndex == undefined) {
+//       return (lastComputerLuckyHit = "");
+//     } else return nextIndex;
+//   } else {
+//     console.log(nextIndex);
+//     nextIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
+//     if (nextIndex == undefined) {
+//       return (lastComputerLuckyHit = "");
+//     } else return nextIndex;
+//   }
+// }
 
 function AllAroundLuckyCrossBlocks(Boardblocks, block) {
   let numblockId = Number(block.dataset.id);
@@ -442,25 +454,6 @@ let lastSavedZone;
 let FirstShot = true;
 let sessionHit = { TrophiesLenght: 0, Trophies: [] };
 
-function ComputersNextMove(LuckyBlock) {
-  let nextIndex;
-  let arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, LuckyBlock);
-  let arr2 = AllAroundBlocks(AllPlayerBlocks, LuckyBlock);
-  if (ComputerhitShip) {
-    console.log(nextIndex);
-    nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
-    if (nextIndex == undefined) {
-      return (lastComputerLuckyHit = "");
-    } else return nextIndex;
-  } else {
-    console.log(nextIndex);
-    nextIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
-    if (nextIndex == undefined) {
-      return (lastComputerLuckyHit = "");
-    } else return nextIndex;
-  }
-}
-
 function randUnusedZone() {
   let zone;
   do {
@@ -470,14 +463,12 @@ function randUnusedZone() {
   return zone;
 }
 function Randomhit() {
+  PlayerTurn = true;
   sessionHit = {};
   sessionHit.TrophiesLenght = 0;
   sessionHit.Trophies = [];
   let zone = randUnusedZone();
 
-  // &&
-  //   !zone.classList.contains("--used") &&
-  //   !Gameover jeigu neveiks ifuose prideti sias salygas
   if (CheckAroundTakenBlocks(zone)) {
     lastComputerLuckyHit = "lucky";
     lastSavedZone = zone;
@@ -519,7 +510,6 @@ function Randomhit() {
         sessionHit.Trophies.push(zone);
       }
     });
-    FirstShot = true;
     lastSavedZone = zone;
     zone.classList.add("--used");
     zone.innerHTML = Hithtml;
@@ -528,19 +518,18 @@ function Randomhit() {
     zone.innerHTML = html;
     infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
   } else return Computer();
-  PlayerTurn = true;
 }
 
 function Luckyhit(SavedZone) {
+  PlayerTurn = true;
   let arr2 = AllAroundBlocks(AllPlayerBlocks, SavedZone);
   let RandomIndex;
   let zone;
   arr2 = arr2.filter((block) => !block.classList.contains("--used"));
-
-  RandomIndex = Number(arr2[rand(0, arr2.length - 1)].dataset.id);
-  if (arr2 == [] || !RandomIndex) {
+  if (arr2 == []) {
     return Randomhit();
   }
+  RandomIndex = Number(arr2[rand(0, arr2.length - 1)].dataset.id);
 
   zone = AllPlayerBlocks[RandomIndex];
 
@@ -601,10 +590,10 @@ function Luckyhit(SavedZone) {
     zone.innerHTML = html;
     infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
   } else return Computer();
-  PlayerTurn = true;
 }
 
 function Shiphit(SavedZone) {
+  PlayerTurn = true;
   let arr1;
   let RandomIndex;
   let zone;
@@ -616,60 +605,40 @@ function Shiphit(SavedZone) {
 
     RandomIndex = Number(SavedZone.dataset.id) - differ;
     console.log(lastSavedZone, differ, RandomIndex);
-    // if (
-    //   AllPlayerBlocks[RandomIndex].classList.contains("--used") &&
-    //   sessionHit.Trophies.some((block) => block == AllPlayerBlocks[RandomIndex])
-    // ) {
-    //   let NextHits = UsedPlayerShipblocks.filter(
-    //     (word) => word == word.classList.contains(`${sessionHit.Name}`)
-    //   );
-    //   NextHits = NextHits.filter(
-    //     (block) => !block.classList.contains("--used")
-    //   );
-    //   // if (NextHits == []) {
-    //   //   return Randomhit();
-    //   // }
-    //   NextHits.map((block) => (block = Number(block.dataset.id)));
-    //   console.log("NEXT", NextHits);
-    //   RandomIndex = NextHits[rand(0, NextHits.length - 1)];
-    // } else
-    if (
-      AllPlayerBlocks[RandomIndex].classList.contains("--used") ||
-      AllPlayerBlocks[RandomIndex] == undefined
+    if (RandomIndex % 10 == 0 && (RandomIndex + differ) % 10 == 9) {
+      RandomIndex = Number(sessionHit.Trophies[0].dataset.id) + differ;
+    } else if (
+      AllPlayerBlocks[RandomIndex] == undefined ||
+      AllPlayerBlocks[RandomIndex].classList.contains("--used")
     ) {
       RandomIndex = Number(sessionHit.Trophies[0].dataset.id) + differ;
+      console.log(RandomIndex);
       if (AllPlayerBlocks[RandomIndex].classList.contains("--used")) {
-        let arr = AllAroundBlocks(
-          AllPlayerBlocks,
-          AllPlayerBlocks[RandomIndex]
-        );
-        arr = arr.filter((block) => block.classList.contains("taken"));
-        RandomIndex = Number(arr[0].dataset.id);
+        RandomIndex =
+          Number(
+            sessionHit.Trophies[sessionHit.Trophies.length - 1].dataset.id
+          ) + differ;
+        console.log(RandomIndex);
       }
     }
   } else {
+    console.log();
     arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
     arr1 = arr1.filter((block) => !block.classList.contains("--used"));
     if (arr1 == []) {
       return Randomhit();
     }
     RandomIndex = Number(arr1[rand(0, arr1.length - 1)].dataset.id);
+    console.log(RandomIndex);
   }
 
   zone = AllPlayerBlocks[RandomIndex];
-  if (!RandomIndex || !zone) {
-    console.log("Nesamone");
-    lastComputerLuckyHit = "lucky";
-    return Luckyhit(SavedZone);
-  }
-
   if (sessionHit.TrophiesLenght == sessionHit.Shiplength) {
     console.log("samone");
     return Randomhit();
   }
 
   if (CheckAroundTakenBlocks(zone)) {
-    FirstShot = true;
     lastComputerLuckyHit = "hit";
     lastSavedZone = lastSavedZone;
     zone.innerHTML = html;
@@ -725,126 +694,34 @@ function Shiphit(SavedZone) {
     zone.innerHTML = html;
     infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
   } else return Computer();
-  PlayerTurn = true;
 }
 
 function Computer() {
   setTimeout((_) => {
-    let CompNextMove;
-    console.log(sessionHit);
-    switch (lastComputerLuckyHit) {
-      case "": {
-        console.log("rand");
-
-        CompNextMove = Randomhit();
-        break;
-      }
-      case "lucky": {
-        console.log("luck");
-        console.log(lastSavedZone);
-        CompNextMove = Luckyhit(lastSavedZone);
-        break;
-      }
-      case "hit": {
-        console.log(lastSavedZone);
-        console.log("hit");
-        CompNextMove = Shiphit(lastSavedZone);
-        break;
+    PlayerTurn = true;
+    if (!Gameover) {
+      switch (lastComputerLuckyHit) {
+        case "": {
+          console.log("rand");
+          Randomhit();
+          break;
+        }
+        case "lucky": {
+          console.log("luck");
+          console.log(lastSavedZone);
+          Luckyhit(lastSavedZone);
+          break;
+        }
+        case "hit": {
+          console.log(lastSavedZone);
+          console.log("hit");
+          Shiphit(lastSavedZone);
+          break;
+        }
       }
     }
-
-    return CompNextMove;
   }, 2000);
 }
-
-// function ComputersNextMove(LuckyBlock) {
-//   let nextIndex;
-//   let arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, LuckyBlock);
-//   let arr2 = AllAroundBlocks(AllPlayerBlocks, LuckyBlock);
-//   if (ComputerhitShip) {
-//     console.log(nextIndex);
-//     nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
-//     if (nextIndex == undefined) {
-//       return (lastComputerLuckyHit = "");
-//     } else return nextIndex;
-//   } else {
-//     console.log(nextIndex);
-//     nextIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
-//     if (nextIndex == undefined) {
-//       return (lastComputerLuckyHit = "");
-//     } else return nextIndex;
-//   }
-// }
-
-// function Computer() {
-//   setTimeout((_) => {
-//     let RandomIndex = !!lastComputerLuckyHit
-//       ? ComputersNextMove(lastComputerLuckyHit)
-//       : rand(0, 99);
-//     let zone = AllPlayerBlocks[RandomIndex];
-
-//     if (
-//       CheckAroundTakenBlocks(zone) &&
-//       !zone.classList.contains("--used") &&
-//       !Gameover
-//     ) {
-//       lastComputerLuckyHit = !!ComputerhitShip ? lastComputerLuckyHit : zone;
-//       console.log(zone, RandomIndex, "C turn");
-//       zone.innerHTML = html;
-//       zone.classList.add("--used");
-//       infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
-//       zone.querySelectorAll(".animation").forEach((animation) => {
-//         animation.style.border = "2px solid rgb(153, 186, 105)";
-//       });
-//     } else if (
-//       !zone.classList.contains("--used") &&
-//       CheckHitTakenBlocks(zone) &&
-//       !Gameover
-//     ) {
-//       lastComputerLuckyHit = zone;
-//       ComputerhitShip = true;
-//       AllShipsArray.forEach((ship) => {
-//         if (zone.classList.contains(ship.name)) {
-//           ComputerTrophies.push(ship.name);
-
-//           let hitSum = ComputerTrophies.filter((word) => word == ship.name);
-//           if (ComputerTrophies.length == UsedShipblocks.length) {
-//             infoLine(
-//               `Computer sunk all your ships, you lost!`,
-//               "rgb(81, 27, 20)",
-//               "Computer's"
-//             );
-//             return (Gameover = true);
-//           } else if (hitSum.length == ship.length) {
-//             ComputerhitShip = false;
-//             lastComputerLuckyHit = "";
-//             infoLine(
-//               `Computer sunk your ${ship.name}!`,
-//               "rgb(81, 27, 20)",
-//               "Computer's"
-//             );
-//           } else lastComputerLuckyHit = zone;
-
-//           ComputerhitShip = true;
-//           infoLine(
-//             `Your ${ship.name} was damaged`,
-//             "rgba(183, 138, 24, 0.821)",
-//             "Computer's"
-//           );
-//         }
-//       });
-//       console.log(zone, RandomIndex, "C turn");
-//       zone.classList.add("--used");
-//       zone.innerHTML = Hithtml;
-//     } else if (!zone.classList.contains("--used") && !Gameover) {
-//       zone.classList.add("--used");
-//       console.log(zone, RandomIndex, "C turn");
-//       zone.innerHTML = html;
-//       infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
-//     } else return Computer();
-//     PlayerTurn = true;
-//   }, 2000);
-// }
 
 function Player() {
   ComputersBlock.forEach((zone) => {
@@ -909,18 +786,12 @@ function Player() {
   });
 }
 
-// Player();
-// GameStart();
-
-StartBtn.addEventListener(
-  "click",
-  (event) => {
-    if (UsedPlayerShipblocks.length == 17) {
-      infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
-      clearInterval(timerId);
-      StartBtn.style.color = "yellowgreen";
-      Player();
-    }
-  },
-  { once: true }
-);
+// StartBtn.addEventListener("click", (event) => {
+//   console.log("clicked");
+//   // if (UsedPlayerShipblocks.length == 17) {
+//   infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
+//   clearInterval(timerId);
+//   StartBtn.style.color = "yellowgreen";
+//   Player();
+//   // }
+// });
