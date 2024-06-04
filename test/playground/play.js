@@ -345,7 +345,6 @@ function dragEnd() {
   document.querySelector(".computer-board").style.opacity = "100%";
 }
 
-let gameStart = false;
 function dropShip(e) {
   e.target.classList.remove("dragover");
   const startId = Number(e.target.dataset.id);
@@ -357,8 +356,6 @@ function dropShip(e) {
     draggedShip = null;
   }
   if (UsedPlayerShipblocks.length == 17) {
-    gameStart = true;
-    console.log(gameStart);
     infoLine("Press START to begin the game", "rgba(172, 255, 47, 0.471)");
     timerId = setInterval((_) => {
       StartBtn.style.color =
@@ -403,25 +400,6 @@ AllPlayerBlocks.forEach((playerblock) => {
 //add piece perdaryti i computer ir player
 
 //start game
-
-// function ComputersNextMove(LuckyBlock) {
-//   let nextIndex;
-//   let arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, LuckyBlock);
-//   let arr2 = AllAroundBlocks(AllPlayerBlocks, LuckyBlock);
-//   if (ComputerhitShip) {
-//     console.log(nextIndex);
-//     nextIndex = arr1[rand(0, arr1.length - 1)].dataset.id;
-//     if (nextIndex == undefined) {
-//       return (lastComputerLuckyHit = "");
-//     } else return nextIndex;
-//   } else {
-//     console.log(nextIndex);
-//     nextIndex = arr2[rand(0, arr2.length - 1)].dataset.id;
-//     if (nextIndex == undefined) {
-//       return (lastComputerLuckyHit = "");
-//     } else return nextIndex;
-//   }
-// }
 
 function AllAroundLuckyCrossBlocks(Boardblocks, block) {
   let numblockId = Number(block.dataset.id);
