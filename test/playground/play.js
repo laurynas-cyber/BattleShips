@@ -110,6 +110,30 @@ function AllAroundBlocks(Boardblocks, block) {
   return allAroundBlock;
 }
 
+function AllAroundLuckyCrossBlocks(Boardblocks, block) {
+  let numblockId = Number(block.dataset.id);
+  let allAroundBlock = [];
+  if (numblockId % 10 != 9 && numblockId % 10 != 0) {
+    allAroundBlock.push(Boardblocks[numblockId + 1]);
+    allAroundBlock.push(Boardblocks[numblockId - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+  } else if (numblockId % 10 == 0) {
+    allAroundBlock.push(Boardblocks[numblockId + 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+  } else if (numblockId % 10 == 9) {
+    allAroundBlock.push(Boardblocks[numblockId - 1]);
+    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
+    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
+  }
+  allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
+  allAroundBlock = allAroundBlock.filter(
+    (block) => !block.classList.contains("used")
+  );
+  return allAroundBlock;
+}
+
 function CheckAroundBlocksProduction(arr, shipName) {
   arr = arr.filter((block) => !block.classList.contains(shipName));
   return arr.every((block) => !block.classList.contains("taken"));
@@ -119,9 +143,6 @@ function CheckAroundTakenBlocks(block) {
   return block.classList.contains("takenArround");
 }
 
-// function CheckAroundTakenBlocks(arr) {
-//   return arr.some((block) => block.classList.contains("taken")); //ieskojimui
-// }
 
 function CheckHitTakenBlocks(zone) {
   return zone.classList.contains("taken"); //ieskojimui
@@ -292,13 +313,22 @@ function shadowedDragBlock(arr, percentP, percentC, etarget) {
         let newIndexminus = Number(block.dataset.id) - i;
         let newIndextenminus = newIndexminus - 10;
         let newIndexplus = newIndexminus + 10;
-        if (AllPlayerBlocks[newIndexminus] != undefined) {
+        if (
+          AllPlayerBlocks[newIndexminus] != undefined &&
+          Number(block.dataset.id) % 10 > 0
+        ) {
           AllPlayerBlocks[newIndexminus].style.opacity = percentP;
         }
-        if (AllPlayerBlocks[newIndextenminus] != undefined) {
+        if (
+          AllPlayerBlocks[newIndextenminus] != undefined &&
+          Number(block.dataset.id) % 10 > 0
+        ) {
           AllPlayerBlocks[newIndextenminus].style.opacity = percentP;
         }
-        if (AllPlayerBlocks[newIndexplus] != undefined) {
+        if (
+          AllPlayerBlocks[newIndexplus] != undefined &&
+          Number(block.dataset.id) % 10 > 0
+        ) {
           AllPlayerBlocks[newIndexplus].style.opacity = percentP;
         }
       }
@@ -401,29 +431,7 @@ AllPlayerBlocks.forEach((playerblock) => {
 
 //start game
 
-function AllAroundLuckyCrossBlocks(Boardblocks, block) {
-  let numblockId = Number(block.dataset.id);
-  let allAroundBlock = [];
-  if (numblockId % 10 != 9 && numblockId % 10 != 0) {
-    allAroundBlock.push(Boardblocks[numblockId + 1]);
-    allAroundBlock.push(Boardblocks[numblockId - 1]);
-    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
-    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
-  } else if (numblockId % 10 == 0) {
-    allAroundBlock.push(Boardblocks[numblockId + 1]);
-    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
-    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
-  } else if (numblockId % 10 == 9) {
-    allAroundBlock.push(Boardblocks[numblockId - 1]);
-    allAroundBlock.push(Boardblocks[numblockId + 1 * 10]);
-    allAroundBlock.push(Boardblocks[numblockId - 1 * 10]);
-  }
-  allAroundBlock = allAroundBlock.filter((block) => block !== undefined);
-  allAroundBlock = allAroundBlock.filter(
-    (block) => !block.classList.contains("used")
-  );
-  return allAroundBlock;
-}
+
 
 let PlayerTurn = true;
 let Gameover = false;
@@ -440,6 +448,9 @@ function randUnusedZone() {
   } while (zone.classList.contains("--used"));
   return zone;
 }
+
+
+
 function Randomhit() {
   PlayerTurn = true;
   sessionHit = {};
