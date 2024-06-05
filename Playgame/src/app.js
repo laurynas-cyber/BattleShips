@@ -394,7 +394,6 @@ function dropShip(e) {
     StartBtn.addEventListener(
       "click",
       (event) => {
-        console.log("clicked");
         infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
         clearInterval(timerId);
         StartBtn.style.color = "yellowgreen";
@@ -440,7 +439,6 @@ function randUnusedZone() {
   let zone;
   do {
     zone = AllPlayerBlocks[rand(0, 99)];
-    console.log("randFunk", zone);
   } while (zone.classList.contains("--used"));
   return zone;
 }
@@ -522,7 +520,6 @@ function Luckyhit(SavedZone) {
   let RandomIndex;
   let zone;
   arr2 = arr2.filter((block) => !block.classList.contains("--used"));
-  console.log(arr2);
   if (arr2 == []) {
     return Randomhit();
   }
@@ -534,17 +531,13 @@ function Luckyhit(SavedZone) {
     (block) =>
       block.classList.contains("taken") && !block.classList.contains("--used")
   );
-  console.log(arr2Check);
   if (CheckAroundTakenBlocks(zone)) {
     lastComputerLuckyHit = "lucky";
     lastSavedZone = !!arr2Check ? SavedZone : randUnusedZone();
-    console.log(lastSavedZone);
-    console.log("this");
     return executeLuck(zone);
   } else if (CheckHitTakenBlocks(zone)) {
     return executeHit(zone);
   } else if (!zone.classList.contains("--used") && !Gameover) {
-    console.log("this");
     return executeMiss(zone);
   } else return Computer();
 }
@@ -561,7 +554,6 @@ function Shiphit(SavedZone) {
       Number(sessionHit.Trophies[1].dataset.id);
 
     RandomIndex = Number(SavedZone.dataset.id) - differ;
-    console.log(lastSavedZone, differ, RandomIndex);
     if (RandomIndex % 10 == 0 && (RandomIndex + differ) % 10 == 9) {
       RandomIndex = Number(sessionHit.Trophies[0].dataset.id) + differ;
     } else if (
@@ -569,24 +561,21 @@ function Shiphit(SavedZone) {
       AllPlayerBlocks[RandomIndex].classList.contains("--used")
     ) {
       RandomIndex = Number(sessionHit.Trophies[0].dataset.id) + differ;
-      console.log(RandomIndex);
+
       if (AllPlayerBlocks[RandomIndex].classList.contains("--used")) {
         RandomIndex =
           Number(
             sessionHit.Trophies[sessionHit.Trophies.length - 1].dataset.id
           ) + differ;
-        console.log(RandomIndex);
       }
     }
   } else {
-    console.log();
     arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
     arr1 = arr1.filter((block) => !block.classList.contains("--used"));
     if (arr1 == []) {
       return Randomhit();
     }
     RandomIndex = Number(arr1[rand(0, arr1.length - 1)].dataset.id);
-    console.log(RandomIndex);
   }
 
   zone = AllPlayerBlocks[RandomIndex];
@@ -618,19 +607,14 @@ function Computer() {
     if (!Gameover) {
       switch (lastComputerLuckyHit) {
         case "": {
-          console.log("rand");
           Randomhit();
           break;
         }
         case "lucky": {
-          console.log("luck");
-          console.log(lastSavedZone);
           Luckyhit(lastSavedZone);
           break;
         }
         case "hit": {
-          console.log(lastSavedZone);
-          console.log("hit");
           Shiphit(lastSavedZone);
           break;
         }
@@ -682,7 +666,7 @@ function Player() {
         PlayerTurn == true &&
         !Gameover
       ) {
-        console.log("P turn");
+
         PlayerTurn = false;
         executeMiss(zone);
         return Computer();

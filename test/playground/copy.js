@@ -1,3 +1,5 @@
+// https://web.dev/articles/drag-and-drop
+
 function rand(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -773,12 +775,3 @@ function rand(min, max) {
     });
   }
   
-  // StartBtn.addEventListener("click", (event) => {
-  //   console.log("clicked");
-  //   // if (UsedPlayerShipblocks.length == 17) {
-  //   infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
-  //   clearInterval(timerId);
-  //   StartBtn.style.color = "yellowgreen";
-  //   Player();
-  //   // }
-  // });
