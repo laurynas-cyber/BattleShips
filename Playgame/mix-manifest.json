@@ -1,4 +1,6 @@
 {
     "/public/hard.js": "/public/hard.js",
+    "/public/easy.js": "/public/easy.js",
+    "/public/medium.js": "/public/medium.js",
     "/public/style.css": "/public/style.css"
 }
