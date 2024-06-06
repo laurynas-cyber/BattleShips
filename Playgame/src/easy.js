@@ -12,6 +12,9 @@ const AllPlayerBlocks = document.querySelectorAll(".player-board div");
 const Message = document.querySelector(".message");
 const AllPlayerShips = document.querySelectorAll(".ship");
 const StartBtn = document.querySelector(".btnStart");
+const Mode = document.querySelector(".--Mode");
+const IQ = document.querySelector(".--IQ");
+const ModeShips = document.querySelector(".--MsgModeShips");
 
 let html = ` <div class="zone nothit">
   <div class="animationNot-container">
@@ -32,6 +35,10 @@ let ComputerTrophies = [];
 let notDropped;
 
 let timerId;
+
+Mode.innerText = "Mode: Easy";
+IQ.innerText = "-Avarage Computer IQ";
+ModeShips.innerText = "-Computer ships cannot merge";
 
 //give every field Id
 
@@ -587,13 +594,6 @@ function Shiphit(SavedZone) {
     executeLuck(zone);
   } else if (CheckHitTakenBlocks(zone)) {
     executeHit(zone);
-    if (sessionHit.TrophiesLenght == sessionHit.Shiplength) {
-      sessionHit.Trophies.forEach((blockShip) => {
-        AllAroundBlocks(AllPlayerBlocks, blockShip).forEach((block) =>
-          block.classList.add("--used")
-        );
-      });
-    }
   } else if (!zone.classList.contains("--used") && !Gameover) {
     executeMiss(zone);
   } else return Computer();

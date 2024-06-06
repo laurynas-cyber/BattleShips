@@ -110,15 +110,17 @@ section {
   display: flex;
   width: 100%;
   position: relative;
-  transform: rotateX(0deg);
   animation-name: GoUp;
-  animation-duration: 1s;
+  animation-duration: 2s;
   animation-iteration-count: 1;
   animation-timing-function: ease-out;
+  animation-delay: 0.5s;
+  animation-fill-mode: forwards;
+  visibility: hidden;
 }
 
 .Modeinfo {
-  width: 150px;
+  width: 180px;
   height: 120px;
   padding: 10px;
   display: flex;
@@ -184,6 +186,11 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.ship-conteiner h5 {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 .ship-conteiner .ship {
   margin: 20px 10px 10px 10px;
@@ -289,8 +296,6 @@ button {
 }
 .animationNot-delay {
   position: absolute;
-  /* width: 80%;
-    height: 80%; */
   border-radius: 50%;
   border: 2px solid white;
   animation-name: NotHitted-delay;
@@ -316,8 +321,6 @@ button {
 }
 .animationNot-delay2 {
   position: absolute;
-  /* width: 50%;
-    height: 50%; */
   border-radius: 50%;
   border: 2px solid white;
   animation-name: NotHitted-delay2;
@@ -346,12 +349,10 @@ button {
 }
 .skull .fa-skull {
   color: rgb(139, 190, 69);
-  /* color: rgb(153, 186, 105); */
   scale: 2;
   animation-name: skull;
   animation-duration: 1.3s;
   animation-iteration-count: 1;
-  /* animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1); */
   animation-timing-function: ease-out;
 }
 
@@ -406,12 +407,12 @@ button {
 }
 @keyframes GoUp {
   0% {
-    bottom: -50px;
-    transform: rotateX(90deg);
+    left: -1000px;
+    visibility: hidden;
   }
   100% {
-    bottom: 0;
-    transform: rotateX(0deg);
+    left: 0;
+    visibility: visible;
   }
 }
 .modeBtns {

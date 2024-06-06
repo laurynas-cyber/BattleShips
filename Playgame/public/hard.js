@@ -159,7 +159,7 @@ function AddPiece(ship) {
     if (isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i];
       validHoriz = Number(ComputersBlock[RandomIndex].dataset.id) % 10 + ship.length <= 9;
-      if (validHoriz && validBlock != undefined && !UsedShipblocks.includes(validBlock) && CheckAroundBlocksProduction(AllAroundBlocks(ComputersBlock, validBlock), ship.name)) {
+      if (validHoriz && validBlock != undefined && !UsedShipblocks.includes(validBlock)) {
         shipBlocks.push(validBlock);
       } else {
         i = 0;
@@ -168,7 +168,7 @@ function AddPiece(ship) {
       }
     } else if (!isHorrizontal) {
       validBlock = ComputersBlock[RandomIndex + i * 10];
-      if (validBlock != undefined && !UsedShipblocks.includes(validBlock) && CheckAroundBlocksProduction(AllAroundBlocks(ComputersBlock, validBlock), ship.name)) {
+      if (validBlock != undefined && !UsedShipblocks.includes(validBlock)) {
         shipBlocks.push(validBlock);
       } else {
         i = 0;
@@ -186,6 +186,9 @@ function AddPiece(ship) {
   shipBlocks.forEach(function (block, i) {
     block.classList.add(ship.name);
     block.classList.add("taken");
+    if (block.classList.contains("takenArround")) {
+      block.classList.remove("takenArround");
+    }
     // block.classList.remove("drop-zone"); // parodo visus computer blockus
     block.style.border = "1px solid greenyellow";
     AllAroundBlocks(ComputersBlock, block).forEach(function (blocks) {

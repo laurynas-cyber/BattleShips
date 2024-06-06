@@ -22,6 +22,9 @@ var AllPlayerBlocks = document.querySelectorAll(".player-board div");
 var Message = document.querySelector(".message");
 var AllPlayerShips = document.querySelectorAll(".ship");
 var StartBtn = document.querySelector(".btnStart");
+var Mode = document.querySelector(".--Mode");
+var IQ = document.querySelector(".--IQ");
+var ModeShips = document.querySelector(".--MsgModeShips");
 var html = " <div class=\"zone nothit\">\n  <div class=\"animationNot-container\">\n    <div class=\"animationNot animation\"></div>\n    <div class=\"animationNot-delay animation\"></div>\n    <div class=\"animationNot-delay2 animation\"></div>\n  </div>\n  </div>";
 var Hithtml = "<div class=\"zone hitSkull\">\n  <div class=\"skull\"><i class=\"fa-solid fa-skull\"></i></div>\n  </div>";
 var angle = 0;
@@ -31,6 +34,9 @@ var PlayerTrophies = [];
 var ComputerTrophies = [];
 var notDropped;
 var timerId;
+Mode.innerText = "Mode: Easy";
+IQ.innerText = "-Avarage Computer IQ";
+ModeShips.innerText = "-Computer ships cannot merge";
 
 //give every field Id
 
@@ -492,13 +498,6 @@ function Shiphit(SavedZone) {
     executeLuck(zone);
   } else if (CheckHitTakenBlocks(zone)) {
     executeHit(zone);
-    if (sessionHit.TrophiesLenght == sessionHit.Shiplength) {
-      sessionHit.Trophies.forEach(function (blockShip) {
-        AllAroundBlocks(AllPlayerBlocks, blockShip).forEach(function (block) {
-          return block.classList.add("--used");
-        });
-      });
-    }
   } else if (!zone.classList.contains("--used") && !Gameover) {
     executeMiss(zone);
   } else return Computer();
