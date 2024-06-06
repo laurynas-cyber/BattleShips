@@ -1,5 +1,3 @@
-// https://web.dev/articles/drag-and-drop
-
 function rand(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -16,16 +14,16 @@ const AllPlayerShips = document.querySelectorAll(".ship");
 const StartBtn = document.querySelector(".btnStart");
 
 let html = ` <div class="zone nothit">
-<div class="animationNot-container">
-  <div class="animationNot animation"></div>
-  <div class="animationNot-delay animation"></div>
-  <div class="animationNot-delay2 animation"></div>
-</div>
-</div>`;
+  <div class="animationNot-container">
+    <div class="animationNot animation"></div>
+    <div class="animationNot-delay animation"></div>
+    <div class="animationNot-delay2 animation"></div>
+  </div>
+  </div>`;
 
 let Hithtml = `<div class="zone hitSkull">
-<div class="skull"><i class="fa-solid fa-skull"></i></div>
-</div>`;
+  <div class="skull"><i class="fa-solid fa-skull"></i></div>
+  </div>`;
 let angle = 0;
 let UsedShipblocks = [];
 let UsedPlayerShipblocks = [];
@@ -666,7 +664,6 @@ function Player() {
         PlayerTurn == true &&
         !Gameover
       ) {
-
         PlayerTurn = false;
         executeMiss(zone);
         return Computer();

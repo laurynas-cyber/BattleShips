@@ -1,10 +1,10 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/app.js":
-/*!********************!*\
-  !*** ./src/app.js ***!
-  \********************/
+/***/ "./src/hard.js":
+/*!*********************!*\
+  !*** ./src/hard.js ***!
+  \*********************/
 /***/ (() => {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -28,8 +28,8 @@ var AllPlayerBlocks = document.querySelectorAll(".player-board div");
 var Message = document.querySelector(".message");
 var AllPlayerShips = document.querySelectorAll(".ship");
 var StartBtn = document.querySelector(".btnStart");
-var html = " <div class=\"zone nothit\">\n  <div class=\"animationNot-container\">\n    <div class=\"animationNot animation\"></div>\n    <div class=\"animationNot-delay animation\"></div>\n    <div class=\"animationNot-delay2 animation\"></div>\n  </div>\n  </div>";
-var Hithtml = "<div class=\"zone hitSkull\">\n  <div class=\"skull\"><i class=\"fa-solid fa-skull\"></i></div>\n  </div>";
+var html = " <div class=\"zone nothit\">\n<div class=\"animationNot-container\">\n  <div class=\"animationNot animation\"></div>\n  <div class=\"animationNot-delay animation\"></div>\n  <div class=\"animationNot-delay2 animation\"></div>\n</div>\n</div>";
+var Hithtml = "<div class=\"zone hitSkull\">\n<div class=\"skull\"><i class=\"fa-solid fa-skull\"></i></div>\n</div>";
 var angle = 0;
 var UsedShipblocks = [];
 var UsedPlayerShipblocks = [];
@@ -333,7 +333,6 @@ function dropShip(e) {
       StartBtn.style.color = StartBtn.style.color == "yellowgreen" ? "rgba(172, 255, 47, 0.0)" : "yellowgreen";
     }, 800);
     StartBtn.addEventListener("click", function (event) {
-      console.log("clicked");
       infoLine("Game started, your turn", "rgba(172, 255, 47, 0.471)");
       clearInterval(timerId);
       StartBtn.style.color = "yellowgreen";
@@ -378,7 +377,6 @@ function randUnusedZone() {
   var zone;
   do {
     zone = AllPlayerBlocks[rand(0, 99)];
-    console.log("randFunk", zone);
   } while (zone.classList.contains("--used"));
   return zone;
 }
@@ -433,6 +431,7 @@ function Randomhit() {
   } else if (CheckHitTakenBlocks(zone)) {
     executeHit(zone);
   } else if (!zone.classList.contains("--used") && !Gameover) {
+    lastComputerLuckyHit = "";
     executeMiss(zone);
   } else return Computer();
 }
@@ -455,12 +454,11 @@ function Luckyhit(SavedZone) {
   if (CheckAroundTakenBlocks(zone)) {
     lastComputerLuckyHit = "lucky";
     lastSavedZone = !!arr2Check ? SavedZone : randUnusedZone();
-    executeLuck(zone);
+    return executeLuck(zone);
   } else if (CheckHitTakenBlocks(zone)) {
-    executeHit(zone);
+    return executeHit(zone);
   } else if (!zone.classList.contains("--used") && !Gameover) {
-    executeMiss(zone);
-    lastComputerLuckyHit = "";
+    return executeMiss(zone);
   } else return Computer();
 }
 function Shiphit(SavedZone) {
@@ -472,19 +470,15 @@ function Shiphit(SavedZone) {
   if (sessionHit.TrophiesLenght > 1) {
     differ = Number(sessionHit.Trophies[0].dataset.id) - Number(sessionHit.Trophies[1].dataset.id);
     RandomIndex = Number(SavedZone.dataset.id) - differ;
-    console.log(lastSavedZone, differ, RandomIndex);
     if (RandomIndex % 10 == 0 && (RandomIndex + differ) % 10 == 9) {
       RandomIndex = Number(sessionHit.Trophies[0].dataset.id) + differ;
     } else if (AllPlayerBlocks[RandomIndex] == undefined || AllPlayerBlocks[RandomIndex].classList.contains("--used")) {
       RandomIndex = Number(sessionHit.Trophies[0].dataset.id) + differ;
-      console.log(RandomIndex);
       if (AllPlayerBlocks[RandomIndex].classList.contains("--used")) {
         RandomIndex = Number(sessionHit.Trophies[sessionHit.Trophies.length - 1].dataset.id) + differ;
-        console.log(RandomIndex);
       }
     }
   } else {
-    console.log();
     arr1 = AllAroundLuckyCrossBlocks(AllPlayerBlocks, SavedZone);
     arr1 = arr1.filter(function (block) {
       return !block.classList.contains("--used");
@@ -493,7 +487,6 @@ function Shiphit(SavedZone) {
       return Randomhit();
     }
     RandomIndex = Number(arr1[rand(0, arr1.length - 1)].dataset.id);
-    console.log(RandomIndex);
   }
   zone = AllPlayerBlocks[RandomIndex];
   if (sessionHit.TrophiesLenght == sessionHit.Shiplength) {
@@ -514,7 +507,6 @@ function Shiphit(SavedZone) {
     }
   } else if (!zone.classList.contains("--used") && !Gameover) {
     executeMiss(zone);
-    lastComputerLuckyHit = "";
   } else return Computer();
 }
 function Computer() {
@@ -524,21 +516,16 @@ function Computer() {
       switch (lastComputerLuckyHit) {
         case "":
           {
-            console.log("rand");
             Randomhit();
             break;
           }
         case "lucky":
           {
-            console.log("luck");
-            console.log(lastSavedZone);
             Luckyhit(lastSavedZone);
             break;
           }
         case "hit":
           {
-            console.log(lastSavedZone);
-            console.log("hit");
             Shiphit(lastSavedZone);
             break;
           }
@@ -573,7 +560,6 @@ function Player() {
         zone.innerHTML = Hithtml;
         return Computer();
       } else if (!zone.classList.contains("--used") && PlayerTurn == true && !Gameover) {
-        console.log("P turn");
         PlayerTurn = false;
         executeMiss(zone);
         return Computer();
@@ -683,7 +669,7 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
-/******/ 			"/public/app": 0,
+/******/ 			"/public/hard": 0,
 /******/ 			"public/style": 0
 /******/ 		};
 /******/ 		
@@ -734,7 +720,7 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	__webpack_require__.O(undefined, ["public/style"], () => (__webpack_require__("./src/app.js")))
+/******/ 	__webpack_require__.O(undefined, ["public/style"], () => (__webpack_require__("./src/hard.js")))
 /******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["public/style"], () => (__webpack_require__("./src/style.scss")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
