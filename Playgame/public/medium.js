@@ -406,17 +406,19 @@ function executeHit(block) {
   block.innerHTML = Hithtml;
 }
 function executeLuck(block) {
+  var turn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Computer's";
   block.innerHTML = html;
   block.classList.add("--used");
-  infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
+  infoLine("That was close!", "rgba(183, 138, 24, 0.821)", turn);
   block.querySelectorAll(".animation").forEach(function (animation) {
     animation.style.border = "2px solid rgb(153, 186, 105)";
   });
 }
 function executeMiss(block) {
+  var turn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Computer's";
   block.classList.add("--used");
   block.innerHTML = html;
-  infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
+  infoLine("Missed", "rgba(255, 255, 255, 0.666)", turn);
 }
 function Randomhit() {
   PlayerTurn = true;
@@ -538,7 +540,7 @@ function Player() {
     zone.addEventListener("click", function () {
       if (CheckAroundTakenBlocks(zone) && !zone.classList.contains("--used") && PlayerTurn == true && !Gameover) {
         PlayerTurn = false;
-        executeLuck(zone);
+        executeLuck(zone, "Player's");
         return Computer();
       } else if (!zone.classList.contains("--used") && CheckHitTakenBlocks(zone) && PlayerTurn == true && !Gameover) {
         AllShipsArray.forEach(function (ship) {
@@ -561,7 +563,7 @@ function Player() {
         return Computer();
       } else if (!zone.classList.contains("--used") && PlayerTurn == true && !Gameover) {
         PlayerTurn = false;
-        executeMiss(zone);
+        executeMiss(zone, "Player's");
         return Computer();
       }
     });

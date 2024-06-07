@@ -485,19 +485,19 @@ function executeHit(block) {
   block.innerHTML = Hithtml;
 }
 
-function executeLuck(block) {
+function executeLuck(block, turn = "Computer's") {
   block.innerHTML = html;
   block.classList.add("--used");
-  infoLine("That was close!", "rgba(183, 138, 24, 0.821)", "Computer's");
+  infoLine("That was close!", "rgba(183, 138, 24, 0.821)", turn);
   block.querySelectorAll(".animation").forEach((animation) => {
     animation.style.border = "2px solid rgb(153, 186, 105)";
   });
 }
 
-function executeMiss(block) {
+function executeMiss(block, turn = "Computer's") {
   block.classList.add("--used");
   block.innerHTML = html;
-  infoLine("Missed", "rgba(255, 255, 255, 0.666)", "Computer's");
+  infoLine("Missed", "rgba(255, 255, 255, 0.666)", turn);
 }
 
 function Randomhit() {
@@ -638,7 +638,7 @@ function Player() {
         !Gameover
       ) {
         PlayerTurn = false;
-        executeLuck(zone);
+        executeLuck(zone, "Player's");
         return Computer();
       } else if (
         !zone.classList.contains("--used") &&
@@ -665,6 +665,7 @@ function Player() {
         PlayerTurn = false;
         zone.classList.add("--used");
         zone.innerHTML = Hithtml;
+        
         return Computer();
       } else if (
         !zone.classList.contains("--used") &&
@@ -672,7 +673,7 @@ function Player() {
         !Gameover
       ) {
         PlayerTurn = false;
-        executeMiss(zone);
+        executeMiss(zone, "Player's");
         return Computer();
       }
     });
