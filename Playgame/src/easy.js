@@ -61,17 +61,18 @@ FlipBtn.addEventListener("click", function () {
 
 //ships creator
 class Ship {
-  constructor(name, length) {
+  constructor(name, length, color) {
     this.name = name;
     this.length = length;
+    this.color = color;
   }
 }
 
-const destroyer = new Ship("destroyer", 2);
-const submarine = new Ship("submarine", 3);
-const cruiser = new Ship("cruiser", 3);
-const battleship = new Ship("battleship", 4);
-const carrier = new Ship("carrier", 5);
+const destroyer = new Ship("destroyer", 2, "rgb(46, 116, 81)");
+const submarine = new Ship("submarine", 3, "rgba(38, 182, 204)");
+const cruiser = new Ship("cruiser", 3, "rgba(167, 134, 50)");
+const battleship = new Ship("battleship", 4, "rgba(133, 50, 50)");
+const carrier = new Ship("carrier", 5, "rgb(63, 68, 63)");
 
 const AllShipsArray = [carrier, battleship, cruiser, submarine, destroyer];
 // add ships
@@ -642,6 +643,9 @@ function Player() {
         AllShipsArray.forEach((ship) => {
           if (zone.classList.contains(ship.name)) {
             PlayerTrophies.push(ship.name);
+            zone.innerHTML = Hithtml;
+            zone.querySelector(".fa-skull").style.color =
+              " " + ship.color + " ";
             let hitSum = PlayerTrophies.filter((word) => word == ship.name);
             if (PlayerTrophies.length == UsedShipblocks.length) {
               infoLine(`You sunk all ships, you WON!`, "rgb(81, 27, 20)");
@@ -657,7 +661,7 @@ function Player() {
         });
         PlayerTurn = false;
         zone.classList.add("--used");
-        zone.innerHTML = Hithtml;
+
         return Computer();
       } else if (
         !zone.classList.contains("--used") &&

@@ -64,14 +64,15 @@ class Ship {
   constructor(name, length) {
     this.name = name;
     this.length = length;
+    this.color = color;
   }
 }
 
-const destroyer = new Ship("destroyer", 2);
-const submarine = new Ship("submarine", 3);
-const cruiser = new Ship("cruiser", 3);
-const battleship = new Ship("battleship", 4);
-const carrier = new Ship("carrier", 5);
+const destroyer = new Ship("destroyer", 2, "rgb(46, 116, 81)");
+const submarine = new Ship("submarine", 3, "rgba(38, 182, 204)");
+const cruiser = new Ship("cruiser", 3, "rgba(167, 134, 50)");
+const battleship = new Ship("battleship", 4, "rgba(133, 50, 50)");
+const carrier = new Ship("carrier", 5, "rgb(63, 68, 63)");
 
 const AllShipsArray = [carrier, battleship, cruiser, submarine, destroyer];
 // add ships
@@ -665,7 +666,7 @@ function Player() {
         PlayerTurn = false;
         zone.classList.add("--used");
         zone.innerHTML = Hithtml;
-        
+
         return Computer();
       } else if (
         !zone.classList.contains("--used") &&

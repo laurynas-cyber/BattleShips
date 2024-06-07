@@ -549,6 +549,8 @@ function Player() {
         AllShipsArray.forEach(function (ship) {
           if (zone.classList.contains(ship.name)) {
             PlayerTrophies.push(ship.name);
+            zone.innerHTML = Hithtml;
+            zone.querySelector(".fa-skull").style.color = " " + ship.color + " ";
             var hitSum = PlayerTrophies.filter(function (word) {
               return word == ship.name;
             });
