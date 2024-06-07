@@ -61,13 +61,12 @@ var Ship = /*#__PURE__*/_createClass(function Ship(name, length) {
   _classCallCheck(this, Ship);
   this.name = name;
   this.length = length;
-  this.color = color;
 });
-var destroyer = new Ship("destroyer", 2, "rgb(46, 116, 81)");
-var submarine = new Ship("submarine", 3, "rgba(38, 182, 204)");
-var cruiser = new Ship("cruiser", 3, "rgba(167, 134, 50)");
-var battleship = new Ship("battleship", 4, "rgba(133, 50, 50)");
-var carrier = new Ship("carrier", 5, "rgb(63, 68, 63)");
+var destroyer = new Ship("destroyer", 2);
+var submarine = new Ship("submarine", 3);
+var cruiser = new Ship("cruiser", 3);
+var battleship = new Ship("battleship", 4);
+var carrier = new Ship("carrier", 5);
 var AllShipsArray = [carrier, battleship, cruiser, submarine, destroyer];
 // add ships
 

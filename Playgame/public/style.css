@@ -108,7 +108,31 @@ section {
 
 .sectionbottom {
   display: flex;
+  justify-content: space-between;
   width: 100%;
+  align-items: flex-end;
+}
+.sectionbottom .option-container {
+  position: relative;
+  visibility: hidden;
+  animation-name: Goleft;
+  animation-duration: 2s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-out;
+  animation-delay: 0.5s;
+  animation-fill-mode: forwards;
+}
+.sectionbottom .restartContainer {
+  background-color: rgba(0, 255, 255, 0.255);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 5px;
+  border-radius: 10px;
+  width: 180px;
+  height: 50px;
+  bottom: -100px;
   position: relative;
   animation-name: GoUp;
   animation-duration: 2s;
@@ -116,7 +140,12 @@ section {
   animation-timing-function: ease-out;
   animation-delay: 0.5s;
   animation-fill-mode: forwards;
-  visibility: hidden;
+}
+.sectionbottom .restartContainer .btn {
+  text-decoration: none;
+  font-size: 12px;
+  padding: 7px;
+  margin-bottom: 5px;
 }
 
 .Modeinfo {
@@ -169,7 +198,7 @@ section {
   border-radius: 10px;
 }
 
-.buttons .btn {
+.btn {
   background-color: rgb(2, 43, 79);
   padding: 10px;
   border: none;
@@ -405,13 +434,23 @@ button {
     top: 0px;
   }
 }
-@keyframes GoUp {
+@keyframes Goleft {
   0% {
     left: -1000px;
     visibility: hidden;
   }
   100% {
     left: 0;
+    visibility: visible;
+  }
+}
+@keyframes GoUp {
+  0% {
+    bottom: -100px;
+    visibility: hidden;
+  }
+  100% {
+    bottom: 0px;
     visibility: visible;
   }
 }

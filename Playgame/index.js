@@ -16,8 +16,7 @@ app.get("/", (req, res) => {
 
 app.get("/hard", (req, res) => {
   let html = fs.readFileSync("./data/playground.html", "utf8");
-
-  html = html.replace("{{JS}}", "hard.js");
+  html = html.replace("{{JS}}", "hard.js").replace("{{MODE}}", "medium");
 
   res.send(html);
 });
@@ -25,7 +24,7 @@ app.get("/hard", (req, res) => {
 app.get("/easy", (req, res) => {
   let html = fs.readFileSync("./data/playground.html", "utf8");
 
-  html = html.replace("{{JS}}", "easy.js");
+  html = html.replace("{{JS}}", "easy.js").replace("{{MODE}}", "easy");
 
   res.send(html);
 });
@@ -33,7 +32,7 @@ app.get("/easy", (req, res) => {
 app.get("/medium", (req, res) => {
   let html = fs.readFileSync("./data/playground.html", "utf8");
 
-  html = html.replace("{{JS}}", "medium.js");
+  html = html.replace("{{JS}}", "medium.js").replace("{{MODE}}", "medium");
 
   res.send(html);
 });

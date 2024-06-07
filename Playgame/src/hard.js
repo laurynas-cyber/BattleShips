@@ -636,9 +636,6 @@ function Player() {
         AllShipsArray.forEach((ship) => {
           if (zone.classList.contains(ship.name)) {
             PlayerTrophies.push(ship.name);
-            zone.innerHTML = Hithtml;
-            zone.querySelector(".fa-skull").style.color =
-              " " + ship.color + " ";
             let hitSum = PlayerTrophies.filter((word) => word == ship.name);
             if (PlayerTrophies.length == UsedShipblocks.length) {
               infoLine(`You sunk all ships, you WON!`, "rgb(81, 27, 20)");
