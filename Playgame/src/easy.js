@@ -526,19 +526,22 @@ function Luckyhit(SavedZone) {
   let RandomIndex;
   let zone;
   arr2 = arr2.filter((block) => !block.classList.contains("--used"));
-  if (arr2 == []) {
+  let arr2Check = arr2.some(
+    (block) =>
+      block.classList.contains("taken") && !block.classList.contains("--used")
+  );
+
+  console.log(arr2Check)
+  if (arr2 == [] || !arr2Check) {
     return Randomhit();
   }
   RandomIndex = Number(arr2[rand(0, arr2.length - 1)].dataset.id);
 
   zone = AllPlayerBlocks[RandomIndex];
 
-  let arr2Check = arr2.some(
-    (block) =>
-      block.classList.contains("taken") && !block.classList.contains("--used")
-  );
+ 
   if (CheckAroundTakenBlocks(zone)) {
-    lastComputerLuckyHit = "lucky";
+    lastComputerLuckyHit = !!arr2Check ? "lucky" : "";
     lastSavedZone = !!arr2Check ? SavedZone : randUnusedZone();
     return executeLuck(zone);
   } else if (CheckHitTakenBlocks(zone)) {
